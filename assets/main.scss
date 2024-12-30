@@ -1,0 +1,56 @@
+@import url('colorSchema.css');
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	min-height: 100vh;
+	color: var(--font-color);
+	font-weight: normal;
+	background: var(--background-color);
+	/* transition: color 0.5s, background-color 0.5s; */
+	line-height: 1.6;
+	font-family: 'Roboto Flex', sans-serif;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+input,
+textarea,
+button {
+	font-family: inherit;
+	color: inherit;
+}
+
+a {
+	color: var(--main-color);
+	text-decoration: none;
+	font-weight: 500;
+
+	&:hover {
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 2px;
+	}
+}
+
+#__nuxt {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.material-symbols-outlined {
+	user-select: none;
+	font-variation-settings:
+		'FILL' 0,
+		'wght' 400,
+		'GRAD' 0,
+		'opsz' 24;
+}
+
+::selection {
+	background: color-mix(in srgb, var(--main-color) 70%, transparent);
+}

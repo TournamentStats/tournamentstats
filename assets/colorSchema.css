@@ -1,0 +1,58 @@
+:root {
+	--main-color: #ee1993;
+	--secondary-color: #df7123;
+	--light-shades: #f3f4f1;
+	--light-accent: #9d9cb7;
+	--dark-accent: #927c96;
+
+	--dark-shade: #181A1B;
+	--dark-shade-10: color-mix(in srgb, var(--dark-shade), black 10%);
+	--dark-shade-20: color-mix(in srgb, var(--dark-shade), black 20%);
+	--dark-shade-30: color-mix(in srgb, var(--dark-shade), black 30%);
+	--dark-shade-40: color-mix(in srgb, var(--dark-shade), black 40%);
+	--dark-shade-50: color-mix(in srgb, var(--dark-shade), black 50%);
+	--dark-shade-60: color-mix(in srgb, var(--dark-shade), black 60%);
+	--dark-shade-70: color-mix(in srgb, var(--dark-shade), black 70%);
+	--dark-shade-80: color-mix(in srgb, var(--dark-shade), black 80%);
+	--dark-shade-90: color-mix(in srgb, var(--dark-shade), black 90%);
+
+	--dark-tint-05: color-mix(in srgb, var(--dark-shade), white 5%);
+	--dark-tint-10: color-mix(in srgb, var(--dark-shade), white 10%);
+	--dark-tint-20: color-mix(in srgb, var(--dark-shade), white 20%);
+	--dark-tint-30: color-mix(in srgb, var(--dark-shade), white 30%);
+	--dark-tint-40: color-mix(in srgb, var(--dark-shade), white 40%);
+	--dark-tint-50: color-mix(in srgb, var(--dark-shade), white 50%);
+	--dark-tint-60: color-mix(in srgb, var(--dark-shade), white 60%);
+	--dark-tint-70: color-mix(in srgb, var(--dark-shade), white 70%);
+	--dark-tint-80: color-mix(in srgb, var(--dark-shade), white 80%);
+	--dark-tint-90: color-mix(in srgb, var(--dark-shade), white 90%);
+
+	--error-color: #ef2e4b;
+	--blurple: #5865F2;
+}
+
+:root {
+	--font-color: var(--light-shades);
+	--button-color: var(--main-color);
+	--background-color: var(--dark-shade);
+	--background-shade-10: var(--dark-shade-10);
+	--background-shade-20: var(--dark-shade-20);
+	--background-shade-30: var(--dark-shade-30);
+	--background-shade-40: var(--dark-shade-40);
+	--background-shade-50: var(--dark-shade-50);
+	--background-shade-60: var(--dark-shade-60);
+	--background-shade-70: var(--dark-shade-70);
+	--background-shade-80: var(--dark-shade-80);
+	--background-shade-90: var(--dark-shade-90);
+
+	--background-tint-05: var(--dark-tint-05);
+	--background-tint-10: var(--dark-tint-10);
+	--background-tint-20: var(--dark-tint-20);
+	--background-tint-30: var(--dark-tint-30);
+	--background-tint-40: var(--dark-tint-40);
+	--background-tint-50: var(--dark-tint-50);
+	--background-tint-60: var(--dark-tint-60);
+	--background-tint-70: var(--dark-tint-70);
+	--background-tint-80: var(--dark-tint-80);
+	--background-tint-90: var(--dark-tint-90);
+}

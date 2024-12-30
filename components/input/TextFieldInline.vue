@@ -1,5 +1,5 @@
 <template>
-	<div></div>
+	<div>Enter Text Inline</div>
 </template>
 
 <script lang="ts" setup></script>

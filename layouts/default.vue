@@ -1,10 +1,14 @@
 <template>
-	<div>
-		<header>TS</header>
+	<div class="default-layout">
+		<TheHeader />
 		<slot />
 	</div>
 </template>
 
 <script lang="ts" setup></script>
 
-<style></style>
+<style>
+.default-layout {
+	height: 100vh;
+}
+</style>

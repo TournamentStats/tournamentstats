@@ -1,0 +1,287 @@
+:root {
+	font-size: 16px;
+}
+
+.logo-text {
+	font-size: 1rem;
+	&>span.tournament {
+		text-transform: uppercase;
+		font-variation-settings:
+    /* Weight */
+    'wght' 700,
+    /* Width */
+    'wdth' 31,
+    /* Grade */
+    'GRAD' 109,
+    /* Thick Stroke */
+    'XOPQ' 70,
+    /* Think Stroke */
+    'YOPQ' 79,
+    /* Counter Width */
+    'XTRA' 468,
+    /* Ascender Height */
+    'YTAS' 750,
+    /* Descender Height */
+    'YTDE' -203,
+    /* Lower Case Height */
+    'YTLC' 514,
+    /* Upper Case Height */
+    'YTUC' 618,
+    /* Figure Height */
+    'YTFI' 644,
+		'opsz' 77;
+	}
+	&>span.stats {
+		text-transform: uppercase;
+		font-variation-settings:
+		/* Weight */
+		'wght' 650,
+		/* Width */
+		'wdth' 34,
+		/* Grade */
+		'GRAD' 150,
+		/* Thick Stroke */
+		'XOPQ' 96,
+		/* Think Stroke */
+		'YOPQ' 79,
+		/* Counter Width */
+		'XTRA' 468,
+		/* Ascender Height */
+		'YTAS' 750,
+		/* Descender Height */
+		'YTDE' -203,
+		/* Lower Case Height */
+		'YTLC' 514,
+		/* Upper Case Height */
+		'YTUC' 760,
+		/* Figure Height */
+		'YTFI' 738,
+		'opsz' 60;
+	}
+}
+
+@mixin stylized-heading {
+  font-size: 2.375rem;
+  text-transform: uppercase;
+  font-variation-settings:
+    /* Weight */
+    'wght' 700,
+    /* Width */
+    'wdth' 31,
+    /* Grade */
+    'GRAD' 109,
+    /* Thick Stroke */
+    'XOPQ' 70,
+    /* Think Stroke */
+    'YOPQ' 79,
+    /* Counter Width */
+    'XTRA' 468,
+    /* Ascender Height */
+    'YTAS' 649,
+    /* Descender Height */
+    'YTDE' -165,
+    /* Lower Case Height */
+    'YTLC' 479,
+    /* Upper Case Height */
+    'YTUC' 636,
+    /* Figure Height */
+    'YTFI' 665;
+
+	@media screen and (max-width: 768px) {
+		font-size: 1.5rem;
+
+	}
+}
+
+.stylized-heading {
+  @include stylized-heading;
+}
+
+@mixin primary-heading {
+  font-size: 1.5rem;
+  font-variation-settings:
+	/* Weight */
+	'wght' 650,
+	/* Width */
+	'wdth' 65,
+	/* Grade */
+	'GRAD' 50,
+	/* Thick Stroke */
+	'XOPQ' 80,
+	/* Think Stroke */
+	'YOPQ' 79,
+	/* Counter Width */
+	'XTRA' 468,
+	/* Ascender Height */
+	'YTAS' 733,
+	/* Descender Height */
+	'YTDE' -184,
+	/* Lower Case Height */
+	'YTLC' 514,
+	/* Upper Case Height */
+	'YTUC' 671,
+	/* Figure Height */
+	'YTFI' 738;
+}
+
+h1,
+.primary-heading {
+  @include primary-heading;
+}
+
+@mixin secondary-heading {
+  font-size: 1.25rem;
+  font-variation-settings:
+    /* Weight */
+    'wght' 650,
+    /* Width */
+    'wdth' 65,
+    /* Grade */
+    'GRAD' 50,
+    /* Thick Stroke */
+    'XOPQ' 80,
+    /* Think Stroke */
+    'YOPQ' 79,
+    /* Counter Width */
+    'XTRA' 468,
+    /* Ascender Height */
+    'YTAS' 733,
+    /* Descender Height */
+    'YTDE' -184,
+    /* Lower Case Height */
+    'YTLC' 514,
+    /* Upper Case Height */
+    'YTUC' 671,
+    /* Figure Height */
+    'YTFI' 738;
+}
+
+// Include the mixin in the selectors
+h2,
+.secondary-heading {
+  @include secondary-heading;
+}
+
+// Define the mixin
+@mixin button-text {
+  font-size: 1rem;
+  font-variation-settings:
+    /* Weight */
+    'wght' 650,
+    /* Width */
+    'wdth' 70,
+    /* Grade */
+    'GRAD' 50,
+    /* Thick Stroke */
+    'XOPQ' 80,
+    /* Think Stroke */
+    'YOPQ' 79,
+    /* Counter Width */
+    'XTRA' 468,
+    /* Ascender Height */
+    'YTAS' 733,
+    /* Descender Height */
+    'YTDE' -184,
+    /* Lower Case Height */
+    'YTLC' 514,
+    /* Upper Case Height */
+    'YTUC' 671,
+    /* Figure Height */
+    'YTFI' 738;
+}
+
+button,
+.button-text {
+  @include button-text;
+}
+
+// Define the mixin
+@mixin main-text {
+  font-size: 1rem;
+	font-weight: 450;
+  font-variation-settings:
+    /* Width */
+    'wdth' 80,
+    /* Grade */
+    'GRAD' 0,
+    /* Thick Stroke */
+    'XOPQ' 96,
+    /* Thin Stroke */
+    'YOPQ' 85,
+    /* Counter Width */
+    'XTRA' 468,
+    /* Ascender Height */
+    'YTAS' 738,
+    /* Descender Height */
+    'YTDE' -189,
+    /* Lower Case Height */
+    'YTLC' 514,
+    /* Upper Case Height */
+    'YTUC' 699,
+    /* Figure Height */
+    'YTFI' 738;
+}
+
+// Include the mixin in the selectors
+body,
+p,
+input,
+label,
+.main-text {
+  @include main-text;
+}
+
+footer,
+.footer-text {
+	font-size: 0.75rem;
+	font-variation-settings:
+		/* Weight */
+		'wght' 400,
+		/* Width */
+		'wdth' 80,
+		/* Grade */
+		'GRAD' 0,
+		/* Thick Stroke */
+		'XOPQ' 96,
+		/* Thin Stroke */
+		'YOPQ' 90,
+		/* Counter Width */
+		'XTRA' 468,
+		/* Ascender Height */
+		'YTAS' 750,
+		/* Descender Height */
+		'YTDE' -189,
+		/* Lower Case Height */
+		'YTLC' 514,
+		/* Upper Case Height */
+		'YTUC' 699,
+		/* Figure Height */
+		'YTFI' 738;
+}
+
+.supporting-text {
+	font-size: 0.75rem;
+	font-variation-settings:
+		/* Weight */
+		'wght' 400,
+		/* Width */
+		'wdth' 80,
+		/* Grade */
+		'GRAD' 0,
+		/* Thick Stroke */
+		'XOPQ' 96,
+		/* Thin Stroke */
+		'YOPQ' 85,
+		/* Counter Width */
+		'XTRA' 468,
+		/* Ascender Height */
+		'YTAS' 750,
+		/* Descender Height */
+		'YTDE' -189,
+		/* Lower Case Height */
+		'YTLC' 514,
+		/* Upper Case Height */
+		'YTUC' 699,
+		/* Figure Height */
+		'YTFI' 738;
+}
