@@ -17,10 +17,11 @@
 					:max-file-size-mb="2"
 				/>
 				<BaseCheckbox
-					id="checkbox"
+					id="private-checkbox"
+					v-model="isPrivate"
 					class="checkbox-wrapper"
 				>
-					Is this a public tournament?
+					Is this a private tournament?
 				</BaseCheckbox>
 				<PrimaryButton
 					type="submit"
@@ -40,10 +41,36 @@ definePageMeta({
 
 const tournamentName = ref('')
 const tournamentImage = ref < File | null > (null)
+const isPrivate = ref(false)
 
-function createTournament() {
+let imageId = null
+
+async function createTournament() {
 	console.log(tournamentName, tournamentImage)
+	await $fetch('/api/tournament', {
+		method: 'POST',
+		headers: useRequestHeaders(['cookie']),
+		body: {
+			name: tournamentName.value,
+			isPrivate: isPrivate.value,
+			imageId: imageId,
+		},
+	})
 }
+
+watch(tournamentImage, async (new_image, _) => {
+	if (new_image) {
+		const response = await $fetch<{ imageId: string }>('/api/tournament/image', {
+			method: 'POST',
+			headers: {
+				'cookie': useRequestHeaders(['cookie']).cookie,
+				'Content-Type': 'image/png',
+			},
+			body: tournamentImage.value,
+		})
+		imageId = response.imageId
+	}
+})
 </script>
 
 <style scoped lang="scss">

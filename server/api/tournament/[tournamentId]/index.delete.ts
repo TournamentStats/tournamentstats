@@ -7,11 +7,9 @@ export default defineEventHandler((event) => {
 	const client = await serverSupabaseServiceRole(event)
 
 	const response = await client.from('tournament')
-		.select('short_id, owner_id, name, is_private, start_date, end_date, image_path')
+		.delete()
 		.eq('short_id', tournamentId)
-		.single()
 
-	const { data } = response
 	handleError(user, response)
-	return data
+	return sendNoContent(event, 204)
 })

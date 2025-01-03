@@ -1,7 +1,8 @@
 <template>
-	<div>
+	<div :class="$attrs['class']">
 		<input
 			:id="props.id"
+			v-model="$attrs['v-model']"
 			type="checkbox"
 			class="checkbox material-symbols-outlined"
 		>
@@ -12,6 +13,9 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+	inheritAttrs: false,
+})
 const props = defineProps<{
 	id: string
 }>()

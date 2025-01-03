@@ -7,31 +7,6 @@ export type Json =
 	| Json[]
 
 export type Database = {
-	graphql_public: {
-		Tables: {
-			[_ in never]: never
-		}
-		Views: {
-			[_ in never]: never
-		}
-		Functions: {
-			graphql: {
-				Args: {
-					operationName?: string
-					query?: string
-					variables?: Json
-					extensions?: Json
-				}
-				Returns: Json
-			}
-		}
-		Enums: {
-			[_ in never]: never
-		}
-		CompositeTypes: {
-			[_ in never]: never
-		}
-	}
 	public: {
 		Tables: {
 			format_abbrevation: {
@@ -405,6 +380,8 @@ export type Database = {
 					created_at: string
 					end_date: string | null
 					id: number
+					image_path: string | null
+					is_private: boolean | null
 					name: string
 					owner_id: string
 					short_id: string | null
@@ -414,6 +391,8 @@ export type Database = {
 					created_at?: string
 					end_date?: string | null
 					id?: number
+					image_path?: string | null
+					is_private?: boolean | null
 					name: string
 					owner_id: string
 					short_id?: string | null
@@ -423,20 +402,14 @@ export type Database = {
 					created_at?: string
 					end_date?: string | null
 					id?: number
+					image_path?: string | null
+					is_private?: boolean | null
 					name?: string
 					owner_id?: string
 					short_id?: string | null
 					start_date?: string | null
 				}
-				Relationships: [
-					{
-						foreignKeyName: 'tournament_owner_id_fkey'
-						columns: ['owner_id']
-						isOneToOne: false
-						referencedRelation: 'users'
-						referencedColumns: ['id']
-					},
-				]
+				Relationships: []
 			}
 			tournament_participant: {
 				Row: {
@@ -583,6 +556,7 @@ export type Database = {
 					owner_id: string | null
 					path_tokens: string[] | null
 					updated_at: string | null
+					user_metadata: Json | null
 					version: string | null
 				}
 				Insert: {
@@ -596,6 +570,7 @@ export type Database = {
 					owner_id?: string | null
 					path_tokens?: string[] | null
 					updated_at?: string | null
+					user_metadata?: Json | null
 					version?: string | null
 				}
 				Update: {
@@ -609,6 +584,7 @@ export type Database = {
 					owner_id?: string | null
 					path_tokens?: string[] | null
 					updated_at?: string | null
+					user_metadata?: Json | null
 					version?: string | null
 				}
 				Relationships: [
@@ -630,6 +606,7 @@ export type Database = {
 					key: string
 					owner_id: string | null
 					upload_signature: string
+					user_metadata: Json | null
 					version: string
 				}
 				Insert: {
@@ -640,6 +617,7 @@ export type Database = {
 					key: string
 					owner_id?: string | null
 					upload_signature: string
+					user_metadata?: Json | null
 					version: string
 				}
 				Update: {
@@ -650,6 +628,7 @@ export type Database = {
 					key?: string
 					owner_id?: string | null
 					upload_signature?: string
+					user_metadata?: Json | null
 					version?: string
 				}
 				Relationships: [
@@ -900,4 +879,19 @@ export type Enums<
 	? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
 	: PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
 		? PublicSchema['Enums'][PublicEnumNameOrOptions]
+		: never
+
+export type CompositeTypes<
+	PublicCompositeTypeNameOrOptions extends
+	| keyof PublicSchema['CompositeTypes']
+	| { schema: keyof Database },
+	CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+		schema: keyof Database
+	}
+		? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+		: never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+	? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+	: PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
+		? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
 		: never
