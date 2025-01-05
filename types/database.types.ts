@@ -68,7 +68,7 @@ export type Database = {
 						columns: ['matchup_id']
 						isOneToOne: false
 						referencedRelation: 'matchup'
-						referencedColumns: ['id']
+						referencedColumns: ['matchup_id']
 					},
 				]
 			}
@@ -180,7 +180,7 @@ export type Database = {
 					},
 				]
 			}
-			game_side_stats: {
+			game_team_stats: {
 				Row: {
 					baron_kills: number | null
 					champion_kills: number | null
@@ -190,6 +190,7 @@ export type Database = {
 					inhibitor_kills: number | null
 					rift_herald_kills: number | null
 					side: Database['public']['Enums']['side']
+					team_id: number | null
 					tower_kills: number | null
 					win: boolean | null
 				}
@@ -202,6 +203,7 @@ export type Database = {
 					inhibitor_kills?: number | null
 					rift_herald_kills?: number | null
 					side: Database['public']['Enums']['side']
+					team_id?: number | null
 					tower_kills?: number | null
 					win?: boolean | null
 				}
@@ -214,56 +216,24 @@ export type Database = {
 					inhibitor_kills?: number | null
 					rift_herald_kills?: number | null
 					side?: Database['public']['Enums']['side']
+					team_id?: number | null
 					tower_kills?: number | null
 					win?: boolean | null
 				}
 				Relationships: [
 					{
-						foreignKeyName: 'game_side_stats_game_id_fkey'
-						columns: ['game_id']
-						isOneToOne: false
-						referencedRelation: 'game'
-						referencedColumns: ['game_id']
-					},
-				]
-			}
-			game_side_team_relation: {
-				Row: {
-					game_id: number
-					side: Database['public']['Enums']['side']
-					team_id: number
-				}
-				Insert: {
-					game_id: number
-					side: Database['public']['Enums']['side']
-					team_id: number
-				}
-				Update: {
-					game_id?: number
-					side?: Database['public']['Enums']['side']
-					team_id?: number
-				}
-				Relationships: [
-					{
-						foreignKeyName: 'game_side_team_relation_game_id_fkey'
+						foreignKeyName: 'game_team_stats_game_id_fkey'
 						columns: ['game_id']
 						isOneToOne: false
 						referencedRelation: 'game'
 						referencedColumns: ['game_id']
 					},
 					{
-						foreignKeyName: 'game_side_team_relation_side_game_id_fkey'
-						columns: ['side', 'game_id']
-						isOneToOne: false
-						referencedRelation: 'game_side_stats'
-						referencedColumns: ['side', 'game_id']
-					},
-					{
-						foreignKeyName: 'game_side_team_relation_team_id_fkey'
+						foreignKeyName: 'game_team_stats_team_id_fkey'
 						columns: ['team_id']
 						isOneToOne: false
 						referencedRelation: 'team'
-						referencedColumns: ['id']
+						referencedColumns: ['team_id']
 					},
 				]
 			}
@@ -271,8 +241,8 @@ export type Database = {
 				Row: {
 					created_at: string
 					format: Database['public']['Enums']['format'] | null
-					id: number
-					short_id: string | null
+					matchup_id: number
+					short_id: string
 					team1_id: number
 					team2_id: number
 					tournament_id: number
@@ -280,8 +250,8 @@ export type Database = {
 				Insert: {
 					created_at?: string
 					format?: Database['public']['Enums']['format'] | null
-					id?: number
-					short_id?: string | null
+					matchup_id?: number
+					short_id?: string
 					team1_id: number
 					team2_id: number
 					tournament_id: number
@@ -289,8 +259,8 @@ export type Database = {
 				Update: {
 					created_at?: string
 					format?: Database['public']['Enums']['format'] | null
-					id?: number
-					short_id?: string | null
+					matchup_id?: number
+					short_id?: string
 					team1_id?: number
 					team2_id?: number
 					tournament_id?: number
@@ -301,21 +271,21 @@ export type Database = {
 						columns: ['tournament_id']
 						isOneToOne: false
 						referencedRelation: 'tournament'
-						referencedColumns: ['id']
+						referencedColumns: ['tournament_id']
 					},
 					{
 						foreignKeyName: 'matchup_tournament_id_team1_id_fkey'
 						columns: ['tournament_id', 'team1_id']
 						isOneToOne: false
 						referencedRelation: 'team'
-						referencedColumns: ['tournament_id', 'id']
+						referencedColumns: ['tournament_id', 'team_id']
 					},
 					{
 						foreignKeyName: 'matchup_tournament_id_team2_id_fkey'
 						columns: ['tournament_id', 'team2_id']
 						isOneToOne: false
 						referencedRelation: 'team'
-						referencedColumns: ['tournament_id', 'id']
+						referencedColumns: ['tournament_id', 'team_id']
 					},
 				]
 			}
@@ -346,23 +316,23 @@ export type Database = {
 			team: {
 				Row: {
 					created_at: string
-					id: number
 					name: string
-					short_id: string | null
+					short_id: string
+					team_id: number
 					tournament_id: number
 				}
 				Insert: {
 					created_at?: string
-					id?: number
 					name: string
-					short_id?: string | null
+					short_id?: string
+					team_id?: number
 					tournament_id: number
 				}
 				Update: {
 					created_at?: string
-					id?: number
 					name?: string
-					short_id?: string | null
+					short_id?: string
+					team_id?: number
 					tournament_id?: number
 				}
 				Relationships: [
@@ -371,7 +341,7 @@ export type Database = {
 						columns: ['tournament_id']
 						isOneToOne: false
 						referencedRelation: 'tournament'
-						referencedColumns: ['id']
+						referencedColumns: ['tournament_id']
 					},
 				]
 			}
@@ -379,35 +349,35 @@ export type Database = {
 				Row: {
 					created_at: string
 					end_date: string | null
-					id: number
 					image_path: string | null
 					is_private: boolean | null
 					name: string
 					owner_id: string
-					short_id: string | null
+					short_id: string
 					start_date: string | null
+					tournament_id: number
 				}
 				Insert: {
 					created_at?: string
 					end_date?: string | null
-					id?: number
 					image_path?: string | null
 					is_private?: boolean | null
 					name: string
 					owner_id: string
-					short_id?: string | null
+					short_id?: string
 					start_date?: string | null
+					tournament_id?: number
 				}
 				Update: {
 					created_at?: string
 					end_date?: string | null
-					id?: number
 					image_path?: string | null
 					is_private?: boolean | null
 					name?: string
 					owner_id?: string
-					short_id?: string | null
+					short_id?: string
 					start_date?: string | null
+					tournament_id?: number
 				}
 				Relationships: []
 			}
@@ -443,14 +413,14 @@ export type Database = {
 						columns: ['tournament_id']
 						isOneToOne: false
 						referencedRelation: 'tournament'
-						referencedColumns: ['id']
+						referencedColumns: ['tournament_id']
 					},
 					{
 						foreignKeyName: 'tournament_participant_tournament_id_team_id_fkey'
 						columns: ['tournament_id', 'team_id']
 						isOneToOne: false
 						referencedRelation: 'team'
-						referencedColumns: ['tournament_id', 'id']
+						referencedColumns: ['tournament_id', 'team_id']
 					},
 				]
 			}

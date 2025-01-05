@@ -47,7 +47,7 @@ let imageId = null
 
 async function createTournament() {
 	console.log(tournamentName, tournamentImage)
-	await $fetch('/api/tournament', {
+	await $fetch('/api/tournaments', {
 		method: 'POST',
 		headers: useRequestHeaders(['cookie']),
 		body: {
@@ -60,7 +60,7 @@ async function createTournament() {
 
 watch(tournamentImage, async (new_image, _) => {
 	if (new_image) {
-		const response = await $fetch<{ imageId: string }>('/api/tournament/image', {
+		const response = await $fetch<{ imageId: string }>('/api/tournaments/images', {
 			method: 'POST',
 			headers: {
 				'cookie': useRequestHeaders(['cookie']).cookie,

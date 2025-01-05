@@ -25,12 +25,9 @@ interface Response {
 export default function handleError(user?: User, response: Response) {
 	const { error, status, statusText, data } = response
 
+	// Error codes 400 - 500 should be propagated to the end user
+	// as the server is not responsible for the error
 	if (400 <= status && status < 500) {
-		logger.error(
-			`Error ${status} during ${event.toString()}\n \
-user = ${JSON.stringify(user, null, 4)}\n \
-error = ${JSON.stringify(error, null, 4)}
-			`)
 		throw createError({
 			statusCode: status,
 			statusMessage: statusText,
@@ -39,12 +36,9 @@ error = ${JSON.stringify(error, null, 4)}
 		})
 	}
 
+	// internal server errors are mostly irrelevant to users, so give them a generic error message
+	// but they are relevant to us, so error log them
 	if (500 <= status && status < 600) {
-		logger.error(
-			`Error ${status} during ${event.toString()}\n \
-user = ${JSON.stringify(user, null, 4)}\n \
-error = ${JSON.stringify(error, null, 4)}
-			`)
 		throw createError({
 			statusCode: 500,
 			statusMessage: 'Internal Server error',
