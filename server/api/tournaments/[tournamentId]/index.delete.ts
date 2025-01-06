@@ -44,10 +44,8 @@ export default defineEventHandler({
 			.select()
 			.single()
 
-		const { data, error } = deleteTournamentResponse
-
 		if (deleteTournamentResponse.error) {
-			event.context.error = error
+			event.context.error = deleteTournamentResponse.error
 			handleError(user, deleteTournamentResponse)
 		}
 
