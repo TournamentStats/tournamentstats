@@ -51,9 +51,17 @@ export default defineEventHandler({
 		const { name, imageId } = await readValidatedBody(event, requestBody.parse)
 		const tournamentId = getRouterParam(event, 'tournamentId')
 
+		if (tournamentId == null) {
+			throw createError({
+				status: 404,
+				message: 'Not Found',
+				statusMessage: 'No tournament id given',
+			})
+		}
+
 		// we could also use the authenticated client if RLS is properly setup
 		// const client = await serverSupabaseClient(event)
-		const client = await serverSupabaseServiceRole(event)
+		const client = serverSupabaseServiceRole(event)
 
 		// check permissions
 		const checkPermissionsResponse = await client.from('tournament')
@@ -62,13 +70,12 @@ export default defineEventHandler({
 			.eq('owner_id', user.id)
 			.single()
 
-		const { data, error } = checkPermissionsResponse
-		if (error) {
-			event.context.error = error
-			handleError(user, checkPermissionsResponse)
+		if (checkPermissionsResponse.error) {
+			event.context.error = checkPermissionsResponse.error
+			handleError(checkPermissionsResponse)
 		}
 
-		if (!data) {
+		if (!checkPermissionsResponse.data) {
 			throw createError({
 				statusCode: 403,
 				statusMessage: 'Forbidden',
@@ -76,14 +83,14 @@ export default defineEventHandler({
 			})
 		}
 
-		const teamInsertResponse = await client.from('tournament')
-			.insert({ name: name, tournament_id: data.tournament_id, image_path: `${imageId}.png` })
+		const teamInsertResponse = await client.from('team')
+			.insert({ name: name, tournament_id: checkPermissionsResponse.data.tournament_id })
 			.select(
-				'short_id, owner_id, name, is_private, start_date, end_date, image_path',
+				'short_id, name',
 			)
+			.single()
 
-		handleError(user, teamInsertResponse)
 		setResponseStatus(event, 201, 'Created')
-		return data
+		return teamInsertResponse.data
 	},
 })

@@ -24,10 +24,9 @@ export default defineEventHandler({
 			.eq('owner_id', user.id)
 			.single()
 
-		const { data, error } = checkPermissionsResponse
-		if (error) {
-			event.context.error = error
-			handleError(user, checkPermissionsResponse)
+		if (checkPermissionsResponse.error) {
+			event.context.error = checkPermissionsResponse.error
+			handleError(checkPermissionsResponse)
 		}
 
 		if (!data) {

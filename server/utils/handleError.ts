@@ -1,13 +1,4 @@
-import type { User } from '@supabase/supabase-js'
-import logger from './logging'
-
-interface Response {
-	data: unknown
-	error: Error
-	status: string
-	statusText: string
-}
-
+import type { PostgrestResponseFailure } from '@supabase/postgrest-js'
 /**
  * Takes the result of an supabase query and throws if any errors
  * occurred. 4xx errors of the PostgREST api will be propagated back
@@ -22,7 +13,7 @@ interface Response {
  * @param error structure that holds information about the error
  * @param user the user that sent the request
  */
-export default function handleError(user?: User, response: Response) {
+export default function handleError(response: PostgrestResponseFailure) {
 	const { error, status, statusText, data } = response
 
 	// Error codes 400 - 500 should be propagated to the end user
