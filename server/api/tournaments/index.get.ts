@@ -9,9 +9,14 @@ export default defineEventHandler({
 	],
 	handler: async (event) => {
 		const client = await serverSupabaseServiceRole(event)
-		const { data, error, status, statusText } = await client.from('tournament').select('short_id, name').is('is_private', false)
+		const getTournamentResponse = await client.from('available_tournaments')
+			.select('tournament_id::short_id, name')
 
-		handleError(data, status, statusText, error)
-		return data
+		if (getTournamentResponse.error) {
+			event.context.error = getTournamentResponse.error
+			handleError(getTournamentResponse.error)
+		}
+
+		return getTournamentResponse.data
 	},
 })

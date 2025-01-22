@@ -270,6 +270,13 @@ export type Database = {
 						foreignKeyName: 'matchup_tournament_id_fkey'
 						columns: ['tournament_id']
 						isOneToOne: false
+						referencedRelation: 'available_tournaments'
+						referencedColumns: ['tournament_id']
+					},
+					{
+						foreignKeyName: 'matchup_tournament_id_fkey'
+						columns: ['tournament_id']
+						isOneToOne: false
 						referencedRelation: 'tournament'
 						referencedColumns: ['tournament_id']
 					},
@@ -292,24 +299,24 @@ export type Database = {
 			player: {
 				Row: {
 					created_at: string
-					game_name: string | null
-					profile_icon_id: number | null
+					game_name: string
+					profile_icon_id: number
 					puuid: string
-					tag_line: string | null
+					tag_line: string
 				}
 				Insert: {
 					created_at?: string
-					game_name?: string | null
-					profile_icon_id?: number | null
+					game_name: string
+					profile_icon_id: number
 					puuid: string
-					tag_line?: string | null
+					tag_line: string
 				}
 				Update: {
 					created_at?: string
-					game_name?: string | null
-					profile_icon_id?: number | null
+					game_name?: string
+					profile_icon_id?: number
 					puuid?: string
-					tag_line?: string | null
+					tag_line?: string
 				}
 				Relationships: []
 			}
@@ -340,6 +347,13 @@ export type Database = {
 						foreignKeyName: 'team_tournament_id_fkey'
 						columns: ['tournament_id']
 						isOneToOne: false
+						referencedRelation: 'available_tournaments'
+						referencedColumns: ['tournament_id']
+					},
+					{
+						foreignKeyName: 'team_tournament_id_fkey'
+						columns: ['tournament_id']
+						isOneToOne: false
 						referencedRelation: 'tournament'
 						referencedColumns: ['tournament_id']
 					},
@@ -349,8 +363,7 @@ export type Database = {
 				Row: {
 					created_at: string
 					end_date: string | null
-					image_path: string | null
-					is_private: boolean | null
+					is_private: boolean
 					name: string
 					owner_id: string
 					short_id: string
@@ -360,8 +373,7 @@ export type Database = {
 				Insert: {
 					created_at?: string
 					end_date?: string | null
-					image_path?: string | null
-					is_private?: boolean | null
+					is_private: boolean
 					name: string
 					owner_id: string
 					short_id?: string
@@ -371,8 +383,7 @@ export type Database = {
 				Update: {
 					created_at?: string
 					end_date?: string | null
-					image_path?: string | null
-					is_private?: boolean | null
+					is_private?: boolean
 					name?: string
 					owner_id?: string
 					short_id?: string
@@ -412,6 +423,13 @@ export type Database = {
 						foreignKeyName: 'tournament_participant_tournament_id_fkey'
 						columns: ['tournament_id']
 						isOneToOne: false
+						referencedRelation: 'available_tournaments'
+						referencedColumns: ['tournament_id']
+					},
+					{
+						foreignKeyName: 'tournament_participant_tournament_id_fkey'
+						columns: ['tournament_id']
+						isOneToOne: false
 						referencedRelation: 'tournament'
 						referencedColumns: ['tournament_id']
 					},
@@ -426,7 +444,39 @@ export type Database = {
 			}
 		}
 		Views: {
-			[_ in never]: never
+			available_tournaments: {
+				Row: {
+					created_at: string | null
+					end_date: string | null
+					is_private: boolean | null
+					name: string | null
+					owner_id: string | null
+					short_id: string | null
+					start_date: string | null
+					tournament_id: number | null
+				}
+				Insert: {
+					created_at?: string | null
+					end_date?: string | null
+					is_private?: boolean | null
+					name?: string | null
+					owner_id?: string | null
+					short_id?: string | null
+					start_date?: string | null
+					tournament_id?: number | null
+				}
+				Update: {
+					created_at?: string | null
+					end_date?: string | null
+					is_private?: boolean | null
+					name?: string | null
+					owner_id?: string | null
+					short_id?: string | null
+					start_date?: string | null
+					tournament_id?: number | null
+				}
+				Relationships: []
+			}
 		}
 		Functions: {
 			decode_id_salted: {

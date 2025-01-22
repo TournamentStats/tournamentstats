@@ -52,22 +52,22 @@ export default defineEventHandler({
 			})
 		}
 
-		// could use client if RLS is implemented properly
 		// const client = await serverSupabaseServiceRole(event)
 		const client = await serverSupabaseClient(event)
 
 		// generate random id for image
 		const imageId = image_ids.encode(randomBytes(6))
 
-		const { data, error } = await client.storage.from('tournament-images')
+		const uploadImageResponse = await client.storage.from('tournament-images')
 			.upload(
-				`${imageId}.png`, await img.toBuffer(),
+				`uploads/${imageId}.png`, await img.toBuffer(),
 				{
 					contentType: 'image/png',
 				},
 			)
 
-		if (error) {
+		if (uploadImageResponse.error) {
+			event.context.error = uploadImageResponse.error
 			return createError({
 				statusCode: 500,
 				statusMessage: 'Internal Server error',
@@ -75,11 +75,11 @@ export default defineEventHandler({
 			})
 		}
 
+		const data = uploadImageResponse.data
+
 		logger.info(`Uploaded Image to ${data.fullPath} with id ${data.id}`, { section: 'Storage' })
 
 		setResponseStatus(event, 201, 'Created')
-		return {
-			imageId: imageId,
-		}
+		return { image_id: imageId }
 	},
 })

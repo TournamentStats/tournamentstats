@@ -2,33 +2,43 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 
 import { logAPI } from '~/server/utils/logging'
 
+/**
+ * GET tournaments/[tournamentId]
+ */
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user
-		const tournamentId = getRouterParam(event, 'tournamentId')
+		const shortTournamentId = getRouterParam(event, 'tournamentId')
+
+		if (!shortTournamentId) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: 'Bad Request',
+				message: 'No tournament id given',
+			})
+		}
 
 		const client = await serverSupabaseServiceRole(event)
 
-		const response = await client.from('tournament')
-			.select('short_id, owner_id, name, is_private, start_date, end_date, image_path')
-			.eq('short_id', tournamentId)
+		const getTournamentResponse = await client.from('available_tournaments')
+			.select('short_id, owner_id, name, is_private, start_date, end_date')
+			.eq('short_id', shortTournamentId)
 			.single()
 
-		const { data, error } = response
+		const { data, error } = getTournamentResponse
 
-		if (error) {
+		if (getTournamentResponse.error) {
 			event.context.error = error
-			handleError(user, response)
+			handleError(getTournamentResponse)
 		}
 
-		if (!data || data.is_private) {
+		if (!data) {
 			throw createError({
-				statusCode: 403,
-				statusMessage: 'Forbidden',
-				message: `You are not authorized to access this tournament.`,
+				statusCode: 404,
+				statusMessage: 'Not Found',
+				message: 'Tournament not found',
 			})
 		}
 

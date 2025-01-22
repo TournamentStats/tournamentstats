@@ -3,15 +3,17 @@ import { z } from 'zod'
 import type { User } from '@supabase/supabase-js'
 
 import { serverSupabaseServiceRole } from '#supabase/server'
-import logger, { logAPI } from '~/server/utils/logging'
+import { logAPI } from '~/server/utils/logging'
 import { authentication } from '~/server/utils/middleware'
 
 const requestBody = z.object({
 	name: z.string().min(3).max(32),
-	isPrivate: z.boolean(),
-	imageId: z.string(), // empty string to delete image
+	is_private: z.boolean(),
 })
 
+/**
+ * PUT /tournaments/[tournamentId]
+ */
 export default defineEventHandler({
 	onRequest: [
 		authentication,
@@ -22,88 +24,42 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user as User
 
-		const tournamentId = getRouterParam(event, 'tournamentId')
-		const { name, isPrivate, imageId } = await readValidatedBody(event, requestBody.parse)
-		const imagePath = imageId ? `${imageId}.png` : null
+		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
-		// check if tournament exists and user is permitted to edit it
-		const client = await serverSupabaseServiceRole(event)
-		const response = await client.from('tournament')
-			.select('tournament_id, owner_id, image_path')
-			.eq('short_id', tournamentId)
-			.single()
-
-		handleError(user, response)
-		const { data: currentData } = response
-
-		// check if tournament exists
-		if (!currentData) {
-			return createError({
-				statusCode: 404,
-				statusMessage: 'Not Found',
-				message: `Tournament <${tournamentId}> not found`,
+		if (!shortTournamentId) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: 'Bad Request',
+				message: 'No tournament id given',
 			})
 		}
 
-		if (currentData.owner_id != user.id) {
-			return createError({
-				status: 403,
-				statusMessage: 'Forbidden',
-				message: 'You are not authorized to edit this tournament.',
-			})
-		}
+		const client = serverSupabaseServiceRole()
+		const { name, is_private: isPrivate } = await readValidatedBody(event, requestBody.parse)
 
-		// if image id is given, check if user is authenticated to use it
-		if (imagePath) {
-			const response = await client.schema('storage').from('objects')
-				.select('id')
-				.eq('name', imagePath)
-				.eq('owner_id', user.id)
-
-			handleError(user, response)
-			if (response.data.length == 0) {
-				return createError({
-					statusCode: 404,
-					statusMessage: 'Not Found',
-					message: `Image with id ${imageId} not found.`,
-				})
-			}
-		}
-
-		// delete old file if it exists and is different from new file
-		if (currentData.image_path && currentData.image_path != imagePath) {
-			const { data, error } = await client.storage.from('tournament-images').remove(data.image_path)
-			if (error) {
-				logger.error(`Error during deleting old file. Path: ${data.image_path}.\n${JSON.stringify(error, null, 4)}`)
-				return createError({
-					statusCode: 500,
-					statusMessage: 'Internal Server Error',
-					message: 'Something unexpected happened.',
-				})
-			}
-		}
-
-		const updateResponse = await client.from('tournament')
+		const updateTournamentResponse = await client.from('tournament')
 			.update({
 				name: name,
 				is_private: isPrivate,
-				image_path: imagePath,
 			})
-			.eq('tournament_id', currentData.id)
-			.select('short_id, owner_id, name, is_private, start_date, end_date, image_path')
-			.single()
+			.eq('short_id', shortTournamentId)
+			.eq('owner_id', user.id)
+			.select('short_id, owner_id, name, is_private, start_date, end_date')
+			.maybeSingle()
 
-		handleError(user, updateResponse)
+		if (updateTournamentResponse.error) {
+			event.context.error = updateTournamentResponse.error
+			handleError(updateTournamentResponse)
+		}
 
-		if (!updateResponse.data) {
-			logger.error(`Unexpected empty result when updating:\n${JSON.stringify(user, null, 4)}\nshort_id=${tournamentId}\npath=${imagePath}`)
-			return createError({
-				statusCode: 500,
-				statusMessage: 'Internal Server Error',
-				message: 'Something unexpected happened.',
+		if (!updateTournamentResponse.data) {
+			throw createError({
+				statusCode: 404,
+				statusMessage: 'Not Found',
+				message: 'Tournament not found',
 			})
 		}
 
-		return updateResponse.data
+		return renameShortId(updateTournamentResponse.data, 'tournament_id')
 	},
 })

@@ -9,13 +9,14 @@ import { authentication } from '~/server/utils/middleware'
 
 const requestBody = z.object({
 	name: z.string().min(3).max(32),
-	imageId: z.string().optional(),
+	is_private: z.boolean(),
+	image_id: z.string().optional(),
 })
 
 /**
  * POST /api/tournaments/[tournamentId]/teams
  *
- * Creates a team for tournament
+ * Creates an team in a specific tournament
  *
  * RequestBody: information about the tournament
  * 	name: string
@@ -23,12 +24,13 @@ const requestBody = z.object({
  * 	imageId?: string
  *
  * Returns: Information about the created tournament
- * 	short_id: string
+ * 	tournament_id: string
  * 	owner_id: string (uuid)
  * 	name: string
  * 	is_private : boolean
  * 	start_date: string (iso date)
  * 	end_date: string (iso date)
+ * 	image_url: string (url)
  */
 export default defineEventHandler({
 	onRequest: [
@@ -40,57 +42,109 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user
 
-		if (user == null) {
+		const shortTournamentId = getRouterParam(event, 'tournamentId')
+
+		if (!shortTournamentId) {
 			throw createError({
-				status: 401,
-				message: 'Unauthorized',
-				statusMessage: 'Please authorize by logging in',
+				statusCode: 400,
+				statusMessage: 'Bad Request',
+				message: 'No tournament id given',
 			})
 		}
 
-		const { name, imageId } = await readValidatedBody(event, requestBody.parse)
-		const tournamentId = getRouterParam(event, 'tournamentId')
-
-		if (tournamentId == null) {
-			throw createError({
-				status: 404,
-				message: 'Not Found',
-				statusMessage: 'No tournament id given',
-			})
-		}
-
-		// we could also use the authenticated client if RLS is properly setup
-		// const client = await serverSupabaseClient(event)
 		const client = serverSupabaseServiceRole(event)
 
-		// check permissions
-		const checkPermissionsResponse = await client.from('tournament')
-			.select('tournament_id')
-			.eq('short_id', tournamentId)
+		// check if user is owner of the tournament
+		const checkPermissionResponse = await client.from('available_tournaments')
+			.select('owner_id')
+			.eq('short_id', shortTournamentId)
 			.eq('owner_id', user.id)
-			.single()
+			.maybeSingle()
 
-		if (checkPermissionsResponse.error) {
-			event.context.error = checkPermissionsResponse.error
-			handleError(checkPermissionsResponse)
+		if (checkPermissionResponse.error) {
+			event.context.error = checkPermissionResponse.error
+			handleError(checkPermissionResponse.error)
 		}
 
-		if (!checkPermissionsResponse.data) {
+		if (!checkPermissionResponse.data) {
 			throw createError({
-				statusCode: 403,
-				statusMessage: 'Forbidden',
-				message: 'You are not authorized to add teams to this tournament.',
+				statusCode: 404,
+				statusMessage: 'Not Found',
+				message: 'Tournament not found',
 			})
 		}
 
-		const teamInsertResponse = await client.from('team')
-			.insert({ name: name, tournament_id: checkPermissionsResponse.data.tournament_id })
+		const { name, image_id: imageId } = await readValidatedBody(event, requestBody.parse)
+
+		const createTeamResponse = await client.from('team')
+			.insert({ name: name, tournament_id: shortTournamentId })
 			.select(
-				'short_id, name',
+				'short_id, tournament_id, name',
 			)
 			.single()
 
+		if (createTeamResponse.error) {
+			event.context.error = createTeamResponse.error
+			handleError(createTeamResponse.error)
+		}
+
+		let imageUrl: string | undefined
+		// try to move the image if imageId is provived, rollback if imageId is not found or something unexpected happens
+		if (imageId) {
+			// maybe here should we use the authenticated client?
+			const moveImageResponse = await client.storage.from('tournament-images')
+				.move(`uploads/${imageId}.png`, `${shortTournamentId}/teams/${createTeamResponse.data!.short_id}.png`)
+
+			if (moveImageResponse.error) {
+				event.context.error = moveImageResponse.error
+
+				await client.from('team')
+					.delete()
+					.eq('short_id', createTeamResponse.data!.short_id)
+
+				if (moveImageResponse.error.name == 'NoSuchKey') {
+					throw createError({
+						statusCode: 404,
+						statusMessage: 'Not Found',
+						message: 'Image id not found. Only use ids from image uploads. Upload image and try again.',
+					})
+				}
+
+				throw createError({
+					statusCode: 500,
+					statusMessage: 'Internal Server Error',
+					message: 'Something unexpected happened.',
+				})
+			}
+
+			const signedUrlResponse = await client.storage.from('tournament-images')
+				.createSignedUrl(
+					`${data.short_id}/tournament.png`,
+					60 * 60 * 24,
+				)
+
+			if (signedUrlResponse.error) {
+				event.context.error = signedUrlResponse.error
+
+				await client.from('team')
+					.delete()
+					.eq('short_id', createTeamResponse.data!.short_id)
+
+				throw createError({
+					statusCode: 500,
+					statusMessage: 'Internal Server Error',
+					message: 'Something unexpected happened.',
+				})
+			}
+			imageUrl = signedUrlResponse.data?.signedUrl
+		}
+
+		const data = {
+			...renameShortId(createTeamResponse.data, 'team_id'),
+			image_url: imageUrl,
+		}
+
 		setResponseStatus(event, 201, 'Created')
-		return teamInsertResponse.data
+		return data
 	},
 })

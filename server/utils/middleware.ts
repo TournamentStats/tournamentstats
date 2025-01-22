@@ -9,9 +9,3 @@ export function authentication(event: H3Event<Request>): void {
 		})
 	}
 }
-
-export function validateRouterParam(param: string): (event: H3Event<Request>) => void | Promise<void> {
-	return function (event: H3Event<Request>): void {
-
-	}
-}

@@ -4,6 +4,9 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import { logAPI } from '~/server/utils/logging'
 import { authentication } from '~/server/utils/middleware'
 
+/**
+ * DELETE /tournments/[tournamentId]
+ */
 export default defineEventHandler({
 	onRequest: [
 		authentication,
@@ -13,51 +16,62 @@ export default defineEventHandler({
 	],
 	handler: async (event) => {
 		const user = event.context.auth.user as User
-		const tournamentId = getRouterParam(event, 'tournamentId')
+		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
-		const client = await serverSupabaseServiceRole(event)
-
-		// returns a row if a tournament is found where owner and short_id overlap
-		const checkPermissionsResponse = await client.from('tournament')
-			.select('tournament_id')
-			.eq('short_id', tournamentId)
-			.eq('owner_id', user.id)
-			.single()
-
-		if (checkPermissionsResponse.error) {
-			event.context.error = checkPermissionsResponse.error
-			handleError(checkPermissionsResponse)
-		}
-
-		if (!data) {
+		if (!shortTournamentId) {
 			throw createError({
-				statusCode: 403,
-				statusMessage: 'Forbidden',
-				message: 'You are not authorized to delete this tournament.',
+				statusCode: 400,
+				statusMessage: 'Bad Request',
+				message: 'No tournament id given',
 			})
 		}
 
+		const client = serverSupabaseServiceRole(event)
+
 		const deleteTournamentResponse = await client.from('tournament')
 			.delete()
-			.eq('tournament_id', data.tournament_id)
+			.eq('short_id', shortTournamentId)
+			.eq('owner_id', user.id)
 			.select()
-			.single()
+			.maybeSingle()
 
 		if (deleteTournamentResponse.error) {
 			event.context.error = deleteTournamentResponse.error
 			handleError(user, deleteTournamentResponse)
 		}
 
-		if (deleteTournamentResponse.data.image_path) {
-			const removeImageResponse = await client.storage.from('tournament-images').remove(data.image_path)
-			if (error) {
-				event.context.error = removeImageResponse.error
-				throw createError({
-					statusCode: 500,
-					statusMessage: 'Internal Server Error',
-					message: 'Tournament deleted sucessfully. You propably don\'t have to care.',
-				})
-			}
+		if (!deleteTournamentResponse.data) {
+			throw createError({
+				statusCode: 404,
+				statusMessage: 'Not found',
+				message: `Tournemnt <${shortTournamentId}> not found`,
+			})
+		}
+
+		// theoretical we can return here and execute the deletion in the background
+
+		// delete all files in the tournament folder
+
+		const listFilesResponse = await client.storage.from('tournament-images').list(`${shortTournamentId}/`)
+
+		if (listFilesResponse.error) {
+			event.context.error = listFilesResponse.error
+			throw createError({
+				statusCode: 500,
+				statusMessage: 'Internal Server Error',
+				message: 'Something unexpected during image deletion happened.',
+			})
+		}
+
+		const removeFilesResponse = await client.storage.from('tournament-images').remove(listFilesResponse.data.map(file => file.name))
+
+		if (removeFilesResponse.error) {
+			event.context.error = removeFilesResponse.error
+			throw createError({
+				statusCode: 500,
+				statusMessage: 'Internal Server Error',
+				message: 'Something unexpected during image deletion happened.',
+			})
 		}
 
 		return sendNoContent(event, 204)
