@@ -4,7 +4,7 @@ import type { H3Event, Request, Response } from 'h3'
 
 declare module 'h3' {
 	interface H3EventContext {
-		error?: Error
+		errors: Error[]
 	}
 }
 
@@ -79,7 +79,7 @@ export function logAPI(event: H3Event<Request>, response: {
 		section: 'Tournament API',
 		payload: {
 			response,
-			error: event.context.error,
+			errors: event.context.errors,
 			// dev only logging
 			...import.meta.dev && {
 				user: event.context.auth.user,

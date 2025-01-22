@@ -62,7 +62,7 @@ export default defineEventHandler({
 			.maybeSingle()
 
 		if (checkPermissionResponse.error) {
-			event.context.error = checkPermissionResponse.error
+			event.context.errors.push(checkPermissionResponse.error)
 			handleError(checkPermissionResponse.error)
 		}
 
@@ -79,15 +79,16 @@ export default defineEventHandler({
 		const createTeamResponse = await client.from('team')
 			.insert({ name: name, tournament_id: shortTournamentId })
 			.select(
-				'short_id, tournament_id, name',
+				'team_id:short_id, tournament_id, name',
 			)
 			.single()
 
 		if (createTeamResponse.error) {
-			event.context.error = createTeamResponse.error
+			event.context.errors.push(createTeamResponse.error)
 			handleError(createTeamResponse.error)
 		}
 
+		const teamShortId = createTeamResponse.data!.team_id
 		let imageUrl: string | undefined
 		// try to move the image if imageId is provived, rollback if imageId is not found or something unexpected happens
 		if (imageId) {
@@ -96,11 +97,11 @@ export default defineEventHandler({
 				.move(`uploads/${imageId}.png`, `${shortTournamentId}/teams/${createTeamResponse.data!.short_id}.png`)
 
 			if (moveImageResponse.error) {
-				event.context.error = moveImageResponse.error
+				event.context.errors.push(moveImageResponse.error)
 
 				await client.from('team')
 					.delete()
-					.eq('short_id', createTeamResponse.data!.short_id)
+					.eq('short_id', teamShortId)
 
 				if (moveImageResponse.error.name == 'NoSuchKey') {
 					throw createError({
@@ -119,16 +120,16 @@ export default defineEventHandler({
 
 			const signedUrlResponse = await client.storage.from('tournament-images')
 				.createSignedUrl(
-					`${data.short_id}/tournament.png`,
+					`${teamShortId}/tournament.png`,
 					60 * 60 * 24,
 				)
 
 			if (signedUrlResponse.error) {
-				event.context.error = signedUrlResponse.error
+				event.context.errors.push(signedUrlResponse.error)
 
 				await client.from('team')
 					.delete()
-					.eq('short_id', createTeamResponse.data!.short_id)
+					.eq('short_id', teamShortId)
 
 				throw createError({
 					statusCode: 500,
@@ -139,12 +140,7 @@ export default defineEventHandler({
 			imageUrl = signedUrlResponse.data?.signedUrl
 		}
 
-		const data = {
-			...renameShortId(createTeamResponse.data, 'team_id'),
-			image_url: imageUrl,
-		}
-
 		setResponseStatus(event, 201, 'Created')
-		return data
+		return { ...createTeamResponse.data!, image_url: imageUrl }
 	},
 })

@@ -48,7 +48,7 @@ export default defineEventHandler({
 			.maybeSingle()
 
 		if (updateTournamentResponse.error) {
-			event.context.error = updateTournamentResponse.error
+			event.context.errors.push(updateTournamentResponse.error)
 			handleError(updateTournamentResponse)
 		}
 

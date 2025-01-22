@@ -36,7 +36,7 @@ export default defineEventHandler({
 			.maybeSingle()
 
 		if (deleteTournamentResponse.error) {
-			event.context.error = deleteTournamentResponse.error
+			event.context.errors.push(deleteTournamentResponse.error)
 			handleError(user, deleteTournamentResponse)
 		}
 
@@ -51,27 +51,16 @@ export default defineEventHandler({
 		// theoretical we can return here and execute the deletion in the background
 
 		// delete all files in the tournament folder
-
 		const listFilesResponse = await client.storage.from('tournament-images').list(`${shortTournamentId}/`)
 
 		if (listFilesResponse.error) {
-			event.context.error = listFilesResponse.error
-			throw createError({
-				statusCode: 500,
-				statusMessage: 'Internal Server Error',
-				message: 'Something unexpected during image deletion happened.',
-			})
+			event.context.errors.push(listFilesResponse.error)
 		}
-
-		const removeFilesResponse = await client.storage.from('tournament-images').remove(listFilesResponse.data.map(file => file.name))
-
-		if (removeFilesResponse.error) {
-			event.context.error = removeFilesResponse.error
-			throw createError({
-				statusCode: 500,
-				statusMessage: 'Internal Server Error',
-				message: 'Something unexpected during image deletion happened.',
-			})
+		else {
+			const removeFilesResponse = await client.storage.from('tournament-images').remove(listFilesResponse.data.map(file => file.name))
+			if (removeFilesResponse.error) {
+				event.context.errors.push(removeFilesResponse.error)
+			}
 		}
 
 		return sendNoContent(event, 204)

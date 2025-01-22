@@ -67,7 +67,7 @@ export default defineEventHandler({
 			)
 
 		if (uploadImageResponse.error) {
-			event.context.error = uploadImageResponse.error
+			event.context.errors.push(uploadImageResponse.error)
 			return createError({
 				statusCode: 500,
 				statusMessage: 'Internal Server error',

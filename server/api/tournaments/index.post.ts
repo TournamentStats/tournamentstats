@@ -54,7 +54,7 @@ export default defineEventHandler({
 			.single()
 
 		if (createTournamentResponse.error) {
-			event.context.error = createTournamentResponse.error
+			event.context.errors.push(createTournamentResponse.error)
 			handleError(createTournamentResponse.error)
 		}
 
@@ -67,7 +67,7 @@ export default defineEventHandler({
 				.move(`uploads/${imageId}.png`, `${createTournamentResponse.data!.short_id}/tournament.png`)
 
 			if (moveImageResponse.error) {
-				event.context.error = moveImageResponse.error
+				event.context.errors.push(moveImageResponse.error)
 
 				await client.from('tournament')
 					.delete()
@@ -95,7 +95,7 @@ export default defineEventHandler({
 				)
 
 			if (signedUrlResponse.error) {
-				event.context.error = signedUrlResponse.error
+				event.context.errors.push(signedUrlResponse.error)
 
 				await client.from('tournament')
 					.delete()

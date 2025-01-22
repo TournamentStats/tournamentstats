@@ -13,7 +13,7 @@ export default defineEventHandler({
 			.select('tournament_id::short_id, name')
 
 		if (getTournamentResponse.error) {
-			event.context.error = getTournamentResponse.error
+			event.context.errors.push(getTournamentResponse.error)
 			handleError(getTournamentResponse.error)
 		}
 
