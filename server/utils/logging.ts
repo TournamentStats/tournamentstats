@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
 
-import type { H3Event, Request, Response } from 'h3'
+import type { H3Event, EventHandlerRequest, EventHandlerResponse } from 'h3'
 
 declare module 'h3' {
 	interface H3EventContext {
@@ -27,7 +27,7 @@ declare module 'h3' {
 // })
 
 // Helper function to format payloads as JSON
-const formatPayload = (payload): string =>
+const formatPayload = (payload: object): string =>
 	payload ? JSON.stringify(payload, null, 4) : ''
 
 const logger = createLogger({
@@ -72,8 +72,8 @@ logger.info('Logging started')
 
 export default logger
 
-export function logAPI(event: H3Event<Request>, response: {
-	body?: Awaited<Response>
+export function logAPI(event: H3Event<EventHandlerRequest>, response: {
+	body?: Awaited<EventHandlerResponse>
 }): void {
 	logger.info(`${event.toString()}`, {
 		section: 'Tournament API',

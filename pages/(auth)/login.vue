@@ -7,7 +7,7 @@
 			<BaseForm>
 				<h1>Login</h1>
 				<p>
-					Or <NuxtLink :to="{ path: '/register', query: { redirectTo: route.query.redirectTo } }">
+					Or <NuxtLink :to="{ path: '/register', query: { redirectTo: redirect } }">
 						Sign up
 					</NuxtLink> instead
 				</p>
@@ -45,8 +45,8 @@ definePageMeta({
 	layout: 'login',
 })
 
-const route = useRoute()
-const redirect_url = route.query.redirectTo ?? route.redirectedFrom?.path ?? '/'
+const redirectQuery = useRoute().query.redirectTo
+const redirect = (Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery) ?? '/'
 
 const supabase = useSupabaseClient()
 
@@ -79,7 +79,7 @@ async function handleDiscordLogin() {
 	const { error } = await supabase.auth.signInWithOAuth({
 		provider: 'discord',
 		options: {
-			redirectTo: 'http://localhost:3000/confirm?redirectTo=' + encodeURIComponent(redirect_url),
+			redirectTo: 'http://localhost:3000/confirm?redirectTo=' + encodeURIComponent(redirect),
 		},
 	})
 	if (error) {
@@ -89,7 +89,7 @@ async function handleDiscordLogin() {
 
 supabase.auth.onAuthStateChange((_, session) => {
 	if (session) {
-		navigateTo(redirect_url, { replace: true })
+		navigateTo(redirect, { replace: true })
 	}
 })
 </script>

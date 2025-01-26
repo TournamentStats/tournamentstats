@@ -14,7 +14,7 @@ export default defineEventHandler({
 
 		if (getTournamentResponse.error) {
 			event.context.errors.push(getTournamentResponse.error)
-			handleError(getTournamentResponse.error)
+			handleError(getTournamentResponse)
 		}
 
 		return getTournamentResponse.data

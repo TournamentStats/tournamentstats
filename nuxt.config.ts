@@ -32,21 +32,19 @@ export default defineNuxtConfig({
 	compatibilityDate: '2024-12-29',
 
 	typescript: {
+		typeCheck: true,
 		strict: true,
 	},
 
 	eslint: {
 		config: {
+			typescript: {
+				strict: true,
+			},
 			stylistic: {
 				indent: 'tab',
 			},
 		},
-	},
-
-	// other configs
-	server: {
-		port: 8000, // default: 3000
-		host: '0.0.0.0', // default: localhost
 	},
 
 	supabase: {

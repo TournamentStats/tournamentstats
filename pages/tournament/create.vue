@@ -43,7 +43,7 @@ const tournamentName = ref('')
 const tournamentImage = ref < File | null > (null)
 const isPrivate = ref(false)
 
-let imageId = null
+let imageId: string | null = null
 
 async function createTournament() {
 	console.log(tournamentName, tournamentImage)
@@ -63,7 +63,7 @@ watch(tournamentImage, async (new_image, _) => {
 		const response = await $fetch<{ imageId: string }>('/api/tournaments/images', {
 			method: 'POST',
 			headers: {
-				'cookie': useRequestHeaders(['cookie']).cookie,
+				'cookie': useRequestHeaders(['cookie']).cookie as string,
 				'Content-Type': 'image/png',
 			},
 			body: tournamentImage.value,

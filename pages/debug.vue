@@ -52,7 +52,10 @@
 			placeholder="Password"
 			type="password"
 		/>
-		<TextField />
+		<TextField
+			id="debugTextField"
+			v-model="text1"
+		/>
 		<TextFieldInline />
 		<h1>Upload</h1>
 		<div>

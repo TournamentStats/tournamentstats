@@ -13,7 +13,8 @@
 console.log('confirm')
 const user = useSupabaseUser()
 
-const redirect = useRoute().query.redirectTo ?? '/'
+const redirectQuery = useRoute().query.redirectTo
+const redirect = Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery
 
 watch(user, () => {
 	if (user.value) {

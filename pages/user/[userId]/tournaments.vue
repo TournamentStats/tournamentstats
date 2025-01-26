@@ -7,7 +7,7 @@
 
 <script lang="ts" setup>
 definePageMeta({
-	middleware: 'authorization',
+	middleware: 'user-authorization',
 })
 
 const userId = useRoute().params.userId

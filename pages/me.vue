@@ -1,19 +1,19 @@
 <template>
 	<div>
-		{{ user }}
+		{{ user.data }}
 	</div>
 </template>
 
 <script lang="ts" setup>
+import type { User } from '@supabase/supabase-js'
+
 definePageMeta({
 	middleware: 'authentication',
 })
-const user = ref(null)
-const { data } = await useFetch('/api/me', {
+
+const user = await useFetch<User>('/api/me', {
 	headers: useRequestHeaders(['cookie']),
 })
-
-user.value = data
 </script>
 
 <style>

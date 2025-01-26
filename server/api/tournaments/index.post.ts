@@ -40,7 +40,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user
+		const user = event.context.auth.user!
 
 		const { name, is_private: isPrivate, image_id: imageId } = await readValidatedBody(event, requestBody.parse)
 
@@ -55,8 +55,10 @@ export default defineEventHandler({
 
 		if (createTournamentResponse.error) {
 			event.context.errors.push(createTournamentResponse.error)
-			handleError(createTournamentResponse.error)
+			handleError(createTournamentResponse)
 		}
+
+		const tournamentShortId = createTournamentResponse.data!.short_id
 
 		let imageUrl: string | undefined
 
@@ -64,14 +66,14 @@ export default defineEventHandler({
 		if (imageId) {
 			// maybe here should we use the authenticated client?
 			const moveImageResponse = await client.storage.from('tournament-images')
-				.move(`uploads/${imageId}.png`, `${createTournamentResponse.data!.short_id}/tournament.png`)
+				.move(`uploads/${imageId}.png`, `${tournamentShortId}/tournament.png`)
 
 			if (moveImageResponse.error) {
 				event.context.errors.push(moveImageResponse.error)
 
 				await client.from('tournament')
 					.delete()
-					.eq('short_id', createTournamentResponse.data!.short_id)
+					.eq('short_id', tournamentShortId)
 
 				if (moveImageResponse.error.name == 'NoSuchKey') {
 					throw createError({
@@ -90,7 +92,7 @@ export default defineEventHandler({
 
 			const signedUrlResponse = await client.storage.from('tournament-images')
 				.createSignedUrl(
-					`${data.short_id}/tournament.png`,
+					`${tournamentShortId}/tournament.png`,
 					60 * 60 * 24,
 				)
 
@@ -99,7 +101,7 @@ export default defineEventHandler({
 
 				await client.from('tournament')
 					.delete()
-					.eq('short_id', createTournamentResponse.data.short_id)
+					.eq('short_id', tournamentShortId)
 
 				throw createError({
 					statusCode: 500,
@@ -110,12 +112,7 @@ export default defineEventHandler({
 			imageUrl = signedUrlResponse.data?.signedUrl
 		}
 
-		const data = {
-			...renameShortId(createTournamentResponse.data, 'tournament_id'),
-			image_url: imageUrl,
-		}
-
 		setResponseStatus(event, 201, 'Created')
-		return data
+		return { ...createTournamentResponse.data, image_url: imageUrl }
 	},
 })

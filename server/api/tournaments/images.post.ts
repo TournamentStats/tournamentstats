@@ -48,7 +48,7 @@ export default defineEventHandler({
 			return createError({
 				statusCode: 400,
 				statusMessage: 'Bad Request',
-				mesage: 'Image format not png',
+				message: 'Image format not png',
 			})
 		}
 
@@ -56,7 +56,7 @@ export default defineEventHandler({
 		const client = await serverSupabaseClient(event)
 
 		// generate random id for image
-		const imageId = image_ids.encode(randomBytes(6))
+		const imageId = image_ids.encode(Array.from(randomBytes(6)))
 
 		const uploadImageResponse = await client.storage.from('tournament-images')
 			.upload(
