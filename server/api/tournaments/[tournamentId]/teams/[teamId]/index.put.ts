@@ -35,7 +35,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user
+		const user = event.context.auth.user!
 
 		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
@@ -68,7 +68,7 @@ export default defineEventHandler({
 
 		if (checkPermissionResponse.error) {
 			event.context.errors.push(checkPermissionResponse.error)
-			handleError(checkPermissionResponse.error)
+			handleError(checkPermissionResponse)
 		}
 
 		if (!checkPermissionResponse.data) {
@@ -96,7 +96,7 @@ export default defineEventHandler({
 
 		if (editTeamResponse.error) {
 			event.context.errors.push(editTeamResponse.error)
-			handleError(editTeamResponse.error)
+			handleError(editTeamResponse)
 		}
 
 		if (!editTeamResponse.data) {

@@ -27,14 +27,12 @@ export default defineEventHandler({
 			.eq('short_id', shortTournamentId)
 			.single()
 
-		const { data, error } = getTournamentResponse
-
 		if (getTournamentResponse.error) {
-			event.context.error = error
+			event.context.error = getTournamentResponse.error
 			handleError(getTournamentResponse)
 		}
 
-		if (!data) {
+		if (!getTournamentResponse.data) {
 			throw createError({
 				statusCode: 404,
 				statusMessage: 'Not Found',
@@ -42,6 +40,6 @@ export default defineEventHandler({
 			})
 		}
 
-		return data
+		return getTournamentResponse.data
 	},
 })

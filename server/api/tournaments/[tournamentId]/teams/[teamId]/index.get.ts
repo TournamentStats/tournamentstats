@@ -49,7 +49,7 @@ export default defineEventHandler({
 
 		if (checkPermissionResponse.error) {
 			event.context.errors.push(checkPermissionResponse.error)
-			handleError(checkPermissionResponse.error)
+			handleError(checkPermissionResponse)
 		}
 
 		if (!checkPermissionResponse.data) {
@@ -74,7 +74,7 @@ export default defineEventHandler({
 
 		if (getTeamResponse.error) {
 			event.context.errors.push(getTeamResponse.error)
-			handleError(getTeamResponse.error)
+			handleError(getTeamResponse)
 		}
 
 		if (!getTeamResponse.data) {

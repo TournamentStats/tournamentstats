@@ -56,7 +56,7 @@ export default defineEventHandler({
 
 		if (checkPermissionResponse.error) {
 			event.context.errors.push(checkPermissionResponse.error)
-			handleError(checkPermissionResponse.error)
+			handleError(checkPermissionResponse)
 		}
 
 		if (!checkPermissionResponse.data) {
@@ -76,7 +76,7 @@ export default defineEventHandler({
 
 		if (deleteTeamResponse.error) {
 			event.context.errors.push(deleteTeamResponse.error)
-			handleError(deleteTeamResponse.error)
+			handleError(deleteTeamResponse)
 		}
 
 		if (!deleteTeamResponse.data) {
@@ -88,7 +88,7 @@ export default defineEventHandler({
 		}
 
 		const deleteImageResponse = await client.storage.from('tournament-images')
-			.remove(`${shortTournamentId}/teams/${shortTeamId}.png`)
+			.remove([`${shortTournamentId}/teams/${shortTeamId}.png`])
 
 		if (deleteImageResponse.error) {
 			event.context.errors.push(deleteImageResponse.error)

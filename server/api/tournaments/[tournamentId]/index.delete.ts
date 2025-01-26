@@ -37,14 +37,14 @@ export default defineEventHandler({
 
 		if (deleteTournamentResponse.error) {
 			event.context.errors.push(deleteTournamentResponse.error)
-			handleError(user, deleteTournamentResponse)
+			handleError(deleteTournamentResponse)
 		}
 
 		if (!deleteTournamentResponse.data) {
 			throw createError({
 				statusCode: 404,
 				statusMessage: 'Not found',
-				message: `Tournemnt <${shortTournamentId}> not found`,
+				message: `Tournament not found`,
 			})
 		}
 

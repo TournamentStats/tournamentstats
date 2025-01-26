@@ -56,7 +56,7 @@ export default defineEventHandler({
 
 		if (checkPermissionResponse.error) {
 			event.context.errors.push(checkPermissionResponse.error)
-			handleError(checkPermissionResponse.error)
+			handleError(checkPermissionResponse)
 		}
 
 		if (!checkPermissionResponse.data) {

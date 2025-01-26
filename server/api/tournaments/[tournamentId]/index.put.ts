@@ -22,7 +22,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user as User
+		const user = event.context.auth.user!
 
 		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
@@ -34,7 +34,7 @@ export default defineEventHandler({
 			})
 		}
 
-		const client = serverSupabaseServiceRole()
+		const client = serverSupabaseServiceRole(event)
 		const { name, is_private: isPrivate } = await readValidatedBody(event, requestBody.parse)
 
 		const updateTournamentResponse = await client.from('tournament')
@@ -60,6 +60,6 @@ export default defineEventHandler({
 			})
 		}
 
-		return renameShortId(updateTournamentResponse.data, 'tournament_id')
+		return updateTournamentResponse.data
 	},
 })

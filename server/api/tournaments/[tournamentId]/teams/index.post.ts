@@ -40,7 +40,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user
+		const user = event.context.auth.user!
 
 		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
@@ -56,14 +56,14 @@ export default defineEventHandler({
 
 		// check if user is owner of the tournament
 		const checkPermissionResponse = await client.from('available_tournaments')
-			.select('owner_id')
+			.select('tournament_id')
 			.eq('short_id', shortTournamentId)
 			.eq('owner_id', user.id)
 			.maybeSingle()
 
 		if (checkPermissionResponse.error) {
 			event.context.errors.push(checkPermissionResponse.error)
-			handleError(checkPermissionResponse.error)
+			handleError(checkPermissionResponse)
 		}
 
 		if (!checkPermissionResponse.data) {
@@ -77,7 +77,7 @@ export default defineEventHandler({
 		const { name, image_id: imageId } = await readValidatedBody(event, requestBody.parse)
 
 		const createTeamResponse = await client.from('team')
-			.insert({ name: name, tournament_id: shortTournamentId })
+			.insert({ name: name, tournament_id: checkPermissionResponse.data.tournament_id })
 			.select(
 				'team_id:short_id, tournament_id, name',
 			)
@@ -85,7 +85,7 @@ export default defineEventHandler({
 
 		if (createTeamResponse.error) {
 			event.context.errors.push(createTeamResponse.error)
-			handleError(createTeamResponse.error)
+			handleError(createTeamResponse)
 		}
 
 		const teamShortId = createTeamResponse.data!.team_id
