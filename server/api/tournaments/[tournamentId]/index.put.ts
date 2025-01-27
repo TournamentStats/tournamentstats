@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import type { User } from '@supabase/supabase-js'
-
 import { serverSupabaseServiceRole } from '#supabase/server'
 import { logAPI } from '~/server/utils/logging'
 import { authentication } from '~/server/utils/middleware'

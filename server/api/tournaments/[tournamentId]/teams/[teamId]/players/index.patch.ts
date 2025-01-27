@@ -7,9 +7,18 @@ import handleError from '~/server/utils/handleError'
 import { logAPI } from '~/server/utils/logging'
 import { authentication } from '~/server/utils/middleware'
 
+const puuid = z.string().length(78)
+
+const player = z.object({
+	puuid: puuid,
+	name: z.string().min(2).max(24),
+})
+
+type Player = z.infer<typeof player>
+
 const requestBody = z.object({
-	add: z.array(z.string()),
-	remove: z.array(z.string()),
+	add: z.array(player),
+	remove: z.array(puuid),
 })
 
 /**
@@ -67,6 +76,37 @@ export default defineEventHandler({
 			})
 		}
 
+		const tournamentId = checkPermissionResponse.data.tournament_id
+
 		const { add, remove } = await readValidatedBody(event, requestBody.parse)
+
+		const addPlayersResponse = await client.from('tournament_participant')
+			.insert(add.map(({ puuid, name }: Player) => ({
+				puuid: puuid,
+				tournament_id: tournamentId,
+				name: name,
+			})))
+			.select('puuid, name')
+
+		if (addPlayersResponse.error) {
+			event.context.errors.push(addPlayersResponse.error)
+			handleError(addPlayersResponse)
+		}
+
+		const removePlayersResponse = await client.from('tournament_participant')
+			.delete()
+			.eq('tournament_id', tournamentId)
+			.in('puuid', remove)
+			.select('puuid, name')
+
+		if (removePlayersResponse.error) {
+			event.context.errors.push(removePlayersResponse.error)
+			handleError(removePlayersResponse)
+		}
+
+		return {
+			added: addPlayersResponse.data,
+			removed: removePlayersResponse.data,
+		}
 	},
 })
