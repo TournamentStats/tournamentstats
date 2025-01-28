@@ -8,24 +8,6 @@ declare module 'h3' {
 	}
 }
 
-// const customFormat = format.printf(({ level, message, timestamp }) => {
-// 	return `${timestamp} [${level.toUpperCase()}] ${message}`
-// })
-
-// const loggerOld = createLogger({
-// 	level: 'info',
-// 	transports: [
-// 		new transports.File({
-// 			filename: 'logs/latest.log',
-// 			format: format.combine(
-// 				format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-// 				format.splat(),
-// 				customFormat,
-// 			),
-// 		}),
-// 	],
-// })
-
 // Helper function to format payloads as JSON
 const formatPayload = (payload: object): string =>
 	payload ? JSON.stringify(payload, null, 4) : ''
@@ -83,7 +65,7 @@ export function logAPI(event: H3Event<EventHandlerRequest>, response: {
 			// dev only logging
 			...import.meta.dev && {
 				user: event.context.auth.user,
-				ip_adress: event.context.clientAddress,
+				ip_adress: getRequestIP(event, { xForwardedFor: true }),
 			},
 		},
 	})

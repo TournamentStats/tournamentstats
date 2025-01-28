@@ -10,31 +10,12 @@ import handleError from '~/server/utils/handleError'
 
 import { logAPI } from '~/server/utils/logging'
 import { authentication } from '~/server/utils/middleware'
+import { endPointRateLimit } from '~/server/utils/ratelimit'
 import { Platform, Region, riotFetch } from '~/server/utils/riotFetch'
 
+import type { Summoner, Account } from '~/types/riot.types'
+
 const puuidSchema = z.string().length(78)
-
-interface RiotError {
-	status: {
-		message: string
-		status_code: number
-	}
-}
-
-interface Account {
-	puuid: string
-	gameName: string
-	tagLine: string
-}
-
-interface Summoner {
-	accountId: string
-	profileIconId: number
-	revisionDate: number
-	id: string
-	puuid: string
-	summonerLevel: number
-}
 
 /**
  * Accepts list of puuids to remove/add to team
@@ -42,6 +23,7 @@ interface Summoner {
 export default defineEventHandler({
 	onRequest: [
 		authentication,
+		endPointRateLimit({ requestsPerMinute: 360, requestsPerHour: 7200 }),
 	],
 	onBeforeResponse: [
 		logAPI,
@@ -51,27 +33,42 @@ export default defineEventHandler({
 
 		const puuid = encodeURIComponent(puuidSchema.parse(getRouterParam(event, 'puuid')))
 
+		const lastUpdatedRequest = await client.from('player')
+			.select('last_updated')
+			.eq('puuid', puuid)
+			.maybeSingle()
+
+		if (lastUpdatedRequest.error) {
+			event.context.errors.push(lastUpdatedRequest.error)
+			handleError(lastUpdatedRequest)
+		}
+
+		if (lastUpdatedRequest.data) {
+			const lastUpdated = new Date(lastUpdatedRequest.data.last_updated)
+			if (Date.now() - lastUpdated.getTime() < 1000 * 60 * 10) {
+				const renewableAt = new Date(lastUpdated)
+				renewableAt.setMinutes(renewableAt.getMinutes() + 30)
+
+				setResponseStatus(event, 202)
+				return {
+					message: 'Already renewed.',
+					last_updated: lastUpdated.toISOString(),
+					renewable_at: renewableAt.toISOString(),
+				}
+			}
+		}
+
 		const { gameName, tagLine } = await riotFetch<Account>(
+			event,
 			Region.EUROPE,
 			`/riot/account/v1/accounts/by-puuid/${puuid}`,
-		).catch((error: IFetchError<RiotError>) => {
-			throw createError({
-				statusCode: error.data?.status.status_code,
-				statusMessage: error.data?.status.message.split(' - ')[0],
-				message: error.data?.status.message.split(' - ')[1] ?? '',
-			})
-		})
+		)
 
 		const { profileIconId } = await riotFetch<Summoner>(
-			Platform.BR1,
+			event,
+			Platform.EUW1,
 			`/lol/summoner/v4/summoners/by-puuid/${puuid}`,
-		).catch((error: IFetchError<RiotError>) => {
-			throw createError({
-				statusCode: error.data?.status.status_code,
-				statusMessage: error.data?.status.message.split(' - ')[0],
-				message: error.data?.status.message.split(' - ')[1] ?? '',
-			})
-		})
+		)
 
 		const upsertPlayerResponse = await client.from('player')
 			.upsert({

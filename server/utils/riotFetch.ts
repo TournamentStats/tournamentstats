@@ -1,4 +1,8 @@
-import type { FetchOptions, FetchRequest } from 'ofetch'
+import type { H3Event } from 'h3'
+
+import type { FetchOptions, FetchRequest, IFetchError } from 'ofetch'
+
+import type { RiotError } from '~/types/riot.types'
 
 export enum Region {
 	AMERICAS = 'americas',
@@ -28,15 +32,44 @@ export enum Platform {
 }
 
 export async function riotFetch<T>(
+	event: H3Event,
 	region: Region | Platform | string,
 	request: FetchRequest,
 	options?: Omit<FetchOptions, 'baseURL'>,
 ): Promise<T> {
 	return $fetch<T>(request, {
 		baseURL: `https://${region}.api.riotgames.com/`,
+		retryStatusCodes: [408, 409, 425, 500, 502, 503, 504],
 		headers: {
 			'X-Riot-Token': process.env.RIOT_GAMES_API_KEY ?? '',
 			...options?.headers,
 		},
+	}).catch((error: IFetchError<RiotError>) => {
+		const status_code = error.data?.status.status_code
+		const message = error.data?.status.message ?? 'Error - Something unexpected happened.'
+
+		if (status_code == 400 || status_code == 404) {
+			throw createError({
+				statusCode: error.data?.status.status_code,
+				statusMessage: message.split(' - ')[0],
+				message: message.split(' - ')[1] ?? '',
+			})
+		}
+
+		event.context.errors.push(error)
+
+		if (status_code == 429) {
+			throw createError({
+				statusCode: 429,
+				statusMessage: 'Too many requests',
+				message: 'We are receiving unexpected high traffic. Please try again later.',
+			})
+		}
+
+		throw createError({
+			statusCode: 500,
+			statusMessage: 'Internal Server error',
+			message: 'Something unexpected happened.',
+		})
 	})
 }
