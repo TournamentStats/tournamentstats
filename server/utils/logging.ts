@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from 'winston'
-
-import type { H3Event, EventHandlerRequest, EventHandlerResponse } from 'h3'
+import type { H3Event, EventHandlerResponse } from 'h3'
+import type { TransformableInfo } from '../../node_modules/.pnpm/logform@2.7.0/node_modules/logform/index.d.ts'
 
 declare module 'h3' {
 	interface H3EventContext {
@@ -8,9 +8,13 @@ declare module 'h3' {
 	}
 }
 
+interface Meta {
+	payload?: object
+	section?: string
+}
+
 // Helper function to format payloads as JSON
-const formatPayload = (payload: object): string =>
-	payload ? JSON.stringify(payload, null, 4) : ''
+const formatPayload = (payload: object): string => JSON.stringify(payload, null, 4)
 
 const logger = createLogger({
 	level: 'info',
@@ -22,10 +26,9 @@ const logger = createLogger({
 		new transports.File({
 			filename: 'logs/latest.log',
 			format: format.combine(
-				format.printf(({ timestamp, level, message, ...meta }) => {
-					const payload = meta.payload || null
-					const formattedPayload = payload ? formatPayload(payload) : ''
-					return `${timestamp} [${level.toUpperCase()}] ${meta.section ? `${meta.section} - ` : ''}${message}\n${formattedPayload}`
+				format.printf(({ timestamp, level, message, ...meta }: TransformableInfo & Meta) => {
+					const formattedPayload = meta.payload ? formatPayload(meta.payload) : ''
+					return `${timestamp as string} [${level.toUpperCase()}] ${meta.section ? `${meta.section} - ` : ''}${message?.toString() ?? ''}\n${formattedPayload}`
 				}),
 			),
 		}),
@@ -54,10 +57,10 @@ logger.info('Logging started')
 
 export default logger
 
-export function logAPI(event: H3Event<EventHandlerRequest>, response: {
+export function logAPI(event: H3Event, response: {
 	body?: Awaited<EventHandlerResponse>
 }): void {
-	logger.info(`${event.toString()}`, {
+	logger.info(event.toString(), {
 		section: 'Tournament API',
 		payload: {
 			response,

@@ -42,7 +42,7 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user!
 
-		const { name, is_private: isPrivate, image_id: imageId } = await readValidatedBody(event, requestBody.parse)
+		const { name, is_private: isPrivate, image_id: imageId } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const client = serverSupabaseServiceRole(event)
 
@@ -58,7 +58,7 @@ export default defineEventHandler({
 			handleError(createTournamentResponse)
 		}
 
-		const tournamentShortId = createTournamentResponse.data!.short_id
+		const tournamentShortId = createTournamentResponse.data.short_id
 
 		let imageUrl: string | undefined
 
@@ -109,7 +109,7 @@ export default defineEventHandler({
 					message: 'Something unexpected happened.',
 				})
 			}
-			imageUrl = signedUrlResponse.data?.signedUrl
+			imageUrl = signedUrlResponse.data.signedUrl
 		}
 
 		setResponseStatus(event, 201, 'Created')

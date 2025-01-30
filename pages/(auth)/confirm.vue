@@ -16,9 +16,9 @@ const user = useSupabaseUser()
 const redirectQuery = useRoute().query.redirectTo
 const redirect = Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery
 
-watch(user, () => {
+watch(user, async () => {
 	if (user.value) {
-		navigateTo(redirect)
+		await navigateTo(redirect)
 	}
 }, { immediate: true })
 </script>

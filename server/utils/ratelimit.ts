@@ -10,7 +10,7 @@ export function ratelimit(event: H3Event<Request>): void {
 	}
 }
 
-type Bucket = {
+interface Bucket {
 	minutes: {
 		remaining: number
 		limit: number
@@ -54,7 +54,7 @@ export function endPointRateLimit(options: RateLimitOptions): (event: H3Event<Re
 					lastUpdated: now,
 				},
 			})
-			bucket = endPointRateLimitStore.get(identifier) as Bucket
+			bucket = endPointRateLimitStore.get(identifier)!
 		}
 
 		if (now.getTime() - bucket.minutes.lastUpdated.getTime() >= 60000) {

@@ -78,7 +78,7 @@ export default defineEventHandler({
 
 		const tournamentId = checkPermissionResponse.data.tournament_id
 
-		const { add, remove } = await readValidatedBody(event, requestBody.parse)
+		const { add, remove } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const addPlayersResponse = await client.from('tournament_participant')
 			.insert(add.map(({ puuid, name }: Player) => ({

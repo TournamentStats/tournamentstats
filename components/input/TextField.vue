@@ -2,7 +2,7 @@
 	<div
 		class="input-wrapper"
 		:class="{ error: error }"
-		v-bind="{ class: $attrs.class }"
+		v-bind="{ class: attrsClass }"
 	>
 		<div class="text-box">
 			<input
@@ -49,7 +49,7 @@ defineOptions({
 })
 
 const attrs = useAttrs()
-const { class: _, ...attrsWithoutClass } = attrs
+const { 'class': attrsClass, ...attrsWithoutClass } = attrs
 
 const showPassword = ref(false)
 

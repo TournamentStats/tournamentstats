@@ -63,7 +63,7 @@ watch(tournamentImage, async (new_image, _) => {
 		const response = await $fetch<{ imageId: string }>('/api/tournaments/images', {
 			method: 'POST',
 			headers: {
-				'cookie': useRequestHeaders(['cookie']).cookie as string,
+				'cookie': useRequestHeaders(['cookie']).cookie ?? '',
 				'Content-Type': 'image/png',
 			},
 			body: tournamentImage.value,

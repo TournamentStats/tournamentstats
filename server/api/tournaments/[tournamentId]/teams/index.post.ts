@@ -74,7 +74,7 @@ export default defineEventHandler({
 			})
 		}
 
-		const { name, image_id: imageId } = await readValidatedBody(event, requestBody.parse)
+		const { name, image_id: imageId } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const createTeamResponse = await client.from('team')
 			.insert({ name: name, tournament_id: checkPermissionResponse.data.tournament_id })
@@ -88,13 +88,13 @@ export default defineEventHandler({
 			handleError(createTeamResponse)
 		}
 
-		const teamShortId = createTeamResponse.data!.team_id
+		const teamShortId = createTeamResponse.data.team_id
 		let imageUrl: string | undefined
 		// try to move the image if imageId is provived, rollback if imageId is not found or something unexpected happens
 		if (imageId) {
 			// maybe here should we use the authenticated client?
 			const moveImageResponse = await client.storage.from('tournament-images')
-				.move(`uploads/${imageId}.png`, `${shortTournamentId}/teams/${createTeamResponse.data!.short_id}.png`)
+				.move(`uploads/${imageId}.png`, `${shortTournamentId}/teams/${teamShortId}.png`)
 
 			if (moveImageResponse.error) {
 				event.context.errors.push(moveImageResponse.error)
@@ -137,10 +137,10 @@ export default defineEventHandler({
 					message: 'Something unexpected happened.',
 				})
 			}
-			imageUrl = signedUrlResponse.data?.signedUrl
+			imageUrl = signedUrlResponse.data.signedUrl
 		}
 
 		setResponseStatus(event, 201, 'Created')
-		return { ...createTeamResponse.data!, image_url: imageUrl }
+		return { ...createTeamResponse.data, image_url: imageUrl }
 	},
 })

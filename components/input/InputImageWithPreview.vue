@@ -45,8 +45,8 @@
 <script setup lang="ts">
 const PLACEHOLDER_IMAGE = '/images/team_logo_placeholder.png'
 
-const input = ref<HTMLInputElement>()
-const transfer = ref<HTMLButtonElement>()
+const input = useTemplateRef('input')
+const transfer = useTemplateRef<HTMLElement>('transfer')
 
 const file = defineModel<File | null>({ required: true })
 const imageUrl = ref<string>(PLACEHOLDER_IMAGE)

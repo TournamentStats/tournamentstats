@@ -73,7 +73,7 @@ async function handleRegister() {
 		passwordError.value = true
 		return
 	}
-	navigateTo(redirect)
+	await navigateTo(redirect)
 }
 
 async function handleDiscordLogin() {

@@ -20,12 +20,12 @@ export default defineEventHandler({
 			})
 		}
 
-		const client = await serverSupabaseServiceRole(event)
+		const client = serverSupabaseServiceRole(event)
 
 		const getTournamentResponse = await client.from('available_tournaments')
 			.select('short_id, owner_id, name, is_private, start_date, end_date')
 			.eq('short_id', shortTournamentId)
-			.single()
+			.maybeSingle()
 
 		if (getTournamentResponse.error) {
 			event.context.error = getTournamentResponse.error

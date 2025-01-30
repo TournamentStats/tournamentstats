@@ -12,8 +12,8 @@ import type { ModelRef } from 'vue'
  */
 export function UseFile(
 	file: Ref<File | null> | ModelRef<File | null>,
-	inputElement: Ref<HTMLInputElement | undefined>,
-	transferElement: Ref<HTMLElement | undefined> | null,
+	inputElement: Ref<HTMLInputElement | null>,
+	transferElement?: Ref<HTMLElement | null>,
 ) {
 	const isDragging = ref(false)
 
@@ -24,12 +24,14 @@ export function UseFile(
 	let dragCounter = 0
 
 	function handleClick() {
-		inputElement.value?.click()
+		if (inputElement.value) {
+			inputElement.value.click()
+		}
 	}
 
 	onMounted(() => {
-		if (transferElement) {
-			const elm = transferElement.value!
+		if (transferElement?.value) {
+			const elm = transferElement.value
 			elm.addEventListener('dragenter', (e) => {
 				e.preventDefault()
 				console.log('dragenterr')
@@ -62,7 +64,7 @@ export function UseFile(
 			})
 		}
 
-		inputElement.value!.addEventListener('change', (e) => {
+		inputElement.value?.addEventListener('change', (e) => {
 			const files = (e.target as HTMLInputElement).files
 			if (files?.length) {
 				file.value = files[0]

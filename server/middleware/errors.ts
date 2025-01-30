@@ -1,3 +1,3 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
 	event.context.errors = []
 })

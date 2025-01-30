@@ -2,7 +2,6 @@
  * Accepts a puuid and updates the database with riot api information (name, summoner icon)
  */
 import { z } from 'zod'
-import type { IFetchError } from 'ofetch'
 
 import { serverSupabaseServiceRole } from '#supabase/server'
 
@@ -33,18 +32,18 @@ export default defineEventHandler({
 
 		const puuid = encodeURIComponent(puuidSchema.parse(getRouterParam(event, 'puuid')))
 
-		const lastUpdatedRequest = await client.from('player')
+		const lastUpdatedResponse = await client.from('player')
 			.select('last_updated')
 			.eq('puuid', puuid)
 			.maybeSingle()
 
-		if (lastUpdatedRequest.error) {
-			event.context.errors.push(lastUpdatedRequest.error)
-			handleError(lastUpdatedRequest)
+		if (lastUpdatedResponse.error) {
+			event.context.errors.push(lastUpdatedResponse.error)
+			handleError(lastUpdatedResponse)
 		}
 
-		if (lastUpdatedRequest.data) {
-			const lastUpdated = new Date(lastUpdatedRequest.data.last_updated)
+		if (lastUpdatedResponse.data) {
+			const lastUpdated = new Date(lastUpdatedResponse.data.last_updated)
 			if (Date.now() - lastUpdated.getTime() < 1000 * 60 * 10) {
 				const renewableAt = new Date(lastUpdated)
 				renewableAt.setMinutes(renewableAt.getMinutes() + 30)

@@ -1,4 +1,3 @@
-import type { User } from '@supabase/supabase-js'
 import { serverSupabaseServiceRole } from '#supabase/server'
 
 import { logAPI } from '~/server/utils/logging'
@@ -15,7 +14,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const user = event.context.auth.user as User
+		const user = event.context.auth.user!
 		const shortTournamentId = getRouterParam(event, 'tournamentId')
 
 		if (!shortTournamentId) {
@@ -63,6 +62,6 @@ export default defineEventHandler({
 			}
 		}
 
-		return sendNoContent(event, 204)
+		sendNoContent(event, 204)
 	},
 })

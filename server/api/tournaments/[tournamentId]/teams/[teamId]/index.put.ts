@@ -79,7 +79,7 @@ export default defineEventHandler({
 			})
 		}
 
-		const { name } = await readValidatedBody(event, requestBody.parse)
+		const { name } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const editTeamResponse = await client.from('team')
 			.update({ name: name })

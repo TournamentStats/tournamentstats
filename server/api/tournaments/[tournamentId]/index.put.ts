@@ -33,7 +33,7 @@ export default defineEventHandler({
 		}
 
 		const client = serverSupabaseServiceRole(event)
-		const { name, is_private: isPrivate } = await readValidatedBody(event, requestBody.parse)
+		const { name, is_private: isPrivate } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const updateTournamentResponse = await client.from('tournament')
 			.update({

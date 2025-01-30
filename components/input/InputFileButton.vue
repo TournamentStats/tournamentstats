@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-const input = ref<HTMLInputElement>()
-const transfer = ref<HTMLButtonElement>()
+const input = useTemplateRef('input')
+const transfer = useTemplateRef<HTMLElement>('transfer')
 
 const file = defineModel<File | null>({ required: true })
 

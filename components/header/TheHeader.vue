@@ -35,8 +35,8 @@ onMounted(() => {
 	console.log(user.value)
 })
 
-function logout() {
-	supabase.auth.signOut()
+async function logout() {
+	await supabase.auth.signOut()
 }
 </script>
 

@@ -1,5 +1,4 @@
 import logger from '../utils/logging'
-import { serverSupabaseUser } from '#supabase/server'
 
 const limit = {
 	minutes: 300,
@@ -7,7 +6,7 @@ const limit = {
 }
 
 type Identifier = string
-type Bucket = {
+interface Bucket {
 	minutes: {
 		remaining: number
 		lastUpdated: Date
@@ -20,7 +19,7 @@ type Bucket = {
 
 const rateLimitStore = new Map<Identifier, Bucket>()
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
 	const user = event.context.auth.user
 
 	const identifier = user?.id ?? getRequestIP(event, { xForwardedFor: true })
@@ -54,7 +53,7 @@ export default defineEventHandler(async (event) => {
 				lastUpdated: now,
 			},
 		})
-		bucket = rateLimitStore.get(identifier) as Bucket
+		bucket = rateLimitStore.get(identifier)!
 	}
 
 	if (now.getTime() - bucket.minutes.lastUpdated.getTime() >= 60000) {

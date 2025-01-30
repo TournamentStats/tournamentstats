@@ -13,7 +13,7 @@ import type { PostgrestResponseFailure } from '@supabase/postgrest-js'
  * @param error structure that holds information about the error
  * @param user the user that sent the request
  */
-export default function handleError(response: PostgrestResponseFailure) {
+export default function handleError(response: PostgrestResponseFailure): never {
 	const { error, status, statusText, data } = response
 
 	// Error codes 400 - 500 should be propagated to the end user
@@ -22,18 +22,16 @@ export default function handleError(response: PostgrestResponseFailure) {
 		throw createError({
 			statusCode: status,
 			statusMessage: statusText,
-			message: error!.message,
+			message: error.message,
 			data: data,
 		})
 	}
 
 	// internal server errors are mostly irrelevant to users, so give them a generic error message
 	// but they are relevant to us, so error log them
-	if (500 <= status && status < 600) {
-		throw createError({
-			statusCode: 500,
-			statusMessage: 'Internal Server error',
-			message: 'Something unexpected happened',
-		})
-	}
+	throw createError({
+		statusCode: 500,
+		statusMessage: 'Internal Server error',
+		message: 'Something unexpected happened',
+	})
 }

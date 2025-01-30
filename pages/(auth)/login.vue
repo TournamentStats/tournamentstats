@@ -87,9 +87,9 @@ async function handleDiscordLogin() {
 	}
 }
 
-supabase.auth.onAuthStateChange((_, session) => {
+supabase.auth.onAuthStateChange(async (_, session) => {
 	if (session) {
-		navigateTo(redirect, { replace: true })
+		await navigateTo(redirect, { replace: true })
 	}
 })
 </script>

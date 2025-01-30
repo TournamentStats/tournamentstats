@@ -20,7 +20,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const contentType = await getHeader(event, 'Content-Type')
+		const contentType = getHeader(event, 'Content-Type')
 
 		if (contentType != 'image/png') {
 			return createError({

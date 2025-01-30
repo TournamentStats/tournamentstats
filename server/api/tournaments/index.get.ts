@@ -8,7 +8,8 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const client = await serverSupabaseServiceRole(event)
+		const client = serverSupabaseServiceRole(event)
+
 		const getTournamentResponse = await client.from('available_tournaments')
 			.select('tournament_id::short_id, name')
 

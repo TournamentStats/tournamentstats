@@ -94,6 +94,6 @@ export default defineEventHandler({
 			event.context.errors.push(deleteImageResponse.error)
 		}
 
-		return sendNoContent(event, 204)
+		sendNoContent(event, 204)
 	},
 })

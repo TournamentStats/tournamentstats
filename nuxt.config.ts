@@ -29,18 +29,28 @@ export default defineNuxtConfig({
 	},
 	css: ['normalize.css', '~/assets/main.scss', '~/assets/fonts.scss'],
 
+	runtimeConfig: {
+		riotGamesApiKey: '',
+	},
+
 	compatibilityDate: '2024-12-29',
 
 	typescript: {
 		typeCheck: true,
 		strict: true,
+		tsConfig: {
+			compilerOptions: {
+				strict: true,
+				strictNullChecks: true,
+				noImplicitAny: true,
+				noImplicitThis: true,
+				alwaysStrict: true,
+			},
+		},
 	},
 
 	eslint: {
 		config: {
-			typescript: {
-				strict: true,
-			},
 			stylistic: {
 				indent: 'tab',
 			},
