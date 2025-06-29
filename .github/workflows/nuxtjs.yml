@@ -23,6 +23,9 @@ jobs:
   build:
     environment:
       name: build-project
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ vars.SUPABASE_KEY }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
