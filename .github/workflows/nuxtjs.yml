@@ -26,6 +26,7 @@ jobs:
     env:
       SUPABASE_URL: ${{ vars.SUPABASE_URL }}
       SUPABASE_KEY: ${{ vars.SUPABASE_KEY }}
+      NUXT_APP_BASE_URL: /tournamentstats/
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
