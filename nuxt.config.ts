@@ -1,13 +1,16 @@
+import { resolve } from 'path'
+import devtoolslsJson from 'vite-plugin-devtools-json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	modules: ['@nuxtjs/supabase', '@nuxt/eslint', 'nuxt-openapi-docs-module'],
-
 	components: [
 		{
 			path: '~/components',
 			pathPrefix: false,
 		},
 	],
+
 	devtools: { enabled: true },
 
 	app: {
@@ -33,7 +36,37 @@ export default defineNuxtConfig({
 		riotGamesApiKey: '',
 	},
 
-	compatibilityDate: '2024-12-29',
+	srcDir: 'app/',
+
+	alias: {
+		'~': resolve(__dirname, 'app'),
+		'@': resolve(__dirname, 'app'),
+		'~~': resolve(__dirname),
+		'@@': resolve(__dirname),
+		'#shared': resolve(__dirname, 'shared'),
+		'assets': resolve(__dirname, 'assets'),
+		'public': resolve(__dirname, 'public'),
+		'#build': resolve(__dirname, '.nuxt'),
+		'#internal/nuxt/paths': resolve(__dirname, '.nuxt/paths.mjs'),
+		'@utils': resolve(__dirname, 'app/server/utils'),
+	},
+	build: {
+		transpile: ['riot-games-fetch-typed'],
+	},
+
+	compatibilityDate: '2025-06-09',
+
+	nitro: {
+		imports: {
+			dirs: ['server/utils'],
+		},
+	},
+
+	vite: {
+		plugins: [
+			devtoolslsJson(),
+		],
+	},
 
 	typescript: {
 		typeCheck: true,

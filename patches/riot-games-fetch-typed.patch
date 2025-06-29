@@ -1,0 +1,66 @@
+diff --git a/package.json b/package.json
+index d43a416649b39f4ce11b1636bad3359560155485..8e1b00695bcef339e8d7b6762dc8fe39696345a6 100644
+--- a/package.json
++++ b/package.json
+@@ -1,31 +1,32 @@
+ {
+-  "name": "riot-games-fetch-typed",
+-  "type": "module",
+-  "version": "2.2.1",
+-  "description": "Module that enables typing of Requests to the Riot Games API with ease.",
+-  "main": "src/index.ts",
+-  "repository": {
+-    "type": "git",
+-    "url": "https://github.com/TournamentStats/riot-games-fetch-typed.git"
+-  },
+-  "keywords": [
+-    "riot-games",
+-    "api",
+-    "typescript",
+-    "fetch"
+-  ],
+-  "author": "TippTop",
+-  "license": "MIT",
+-  "devDependencies": {
+-    "openapi-typescript": "^7.6.1",
+-    "tsup": "^8.3.6",
+-    "tsx": "^4.19.2",
+-    "typescript": "^5.7.3"
+-  },
+-  "scripts": {
+-    "generate-types": "openapi-typescript https://www.mingweisamuel.com/riotapi-schema/openapi-3.0.0.yml -o src/types/openapi.d.ts",
+-    "build-no-gen": "tsup-node src/index.ts --dts --format esm,cjs",
+-    "build": "pnpm generate-types && pnpm build-no-gen",
+-    "test": "echo \"Error: no test specified\" && exit 1"
+-  }
++	"name": "riot-games-fetch-typed",
++	"type": "module",
++	"version": "2.2.1",
++	"description": "Module that enables typing of Requests to the Riot Games API with ease.",
++	"main": "dist/index.js",
++	"types": "dist/index.d.ts",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/TournamentStats/riot-games-fetch-typed.git"
++	},
++	"keywords": [
++		"riot-games",
++		"api",
++		"typescript",
++		"fetch"
++	],
++	"author": "TippTop",
++	"license": "MIT",
++	"devDependencies": {
++		"openapi-typescript": "^7.6.1",
++		"tsup": "^8.3.6",
++		"tsx": "^4.19.2",
++		"typescript": "^5.7.3"
++	},
++	"scripts": {
++		"generate-types": "openapi-typescript https://www.mingweisamuel.com/riotapi-schema/openapi-3.0.0.yml -o src/types/openapi.d.ts",
++		"build-no-gen": "tsup-node src/index.ts --dts --format esm,cjs",
++		"build": "pnpm generate-types && pnpm build-no-gen",
++		"test": "echo \"Error: no test specified\" && exit 1"
++	}
+ }

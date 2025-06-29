@@ -1,5 +1,5 @@
 {
-	"name": "nuxt-app",
+	"name": "tournament-stats",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -10,41 +10,52 @@
 		"postinstall": "nuxt prepare",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
-		"lint:no-types": "eslint . -c ./no-types.eslint.config.mts",
-		"lint:fix:no-types": "eslint . -c ./no-types.eslint.config.mts --fix"
+		"gen-db-types": "supabase --workdir ../backend gen types --local --schema public,storage > ./types/database-generated.types.ts"
 	},
 	"dependencies": {
-		"@supabase/postgrest-js": "^1.18.1",
-		"@supabase/supabase-js": "^2.48.1",
+		"@supabase/postgrest-js": "^1.19.4",
+		"@supabase/supabase-js": "^2.50.0",
+		"dotenv": "^16.5.0",
+		"drizzle-orm": "^0.44.2",
 		"normalize.css": "^8.0.1",
-		"sharp": "^0.33.5",
+		"postgres": "^3.4.7",
+		"sharp": "^0.34.2",
 		"sqids": "^0.3.0",
-		"typescript-eslint": "^8.22.0",
-		"vue": "^3.5.13",
-		"vue-router": "^4.5.0",
+		"typescript-eslint": "^8.34.0",
+		"vue": "^3.5.16",
+		"vue-router": "^4.5.1",
 		"winston": "^3.17.0",
-		"zod": "^3.24.1"
+		"zod": "^3.25.56"
 	},
 	"devDependencies": {
-		"@eslint/config-inspector": "^1.0.0",
-		"@nuxt/eslint": "0.7.5",
-		"@nuxtjs/supabase": "^1.4.6",
-		"@types/node": "^22.12.0",
-		"@typescript-eslint/eslint-plugin": "^8.22.0",
-		"eslint": "^9.19.0",
+		"@eslint/config-inspector": "^1.1.0",
+		"@nuxt/eslint": "1.4.1",
+		"@nuxtjs/supabase": "^1.5.1",
+		"@types/node": "^22.15.30",
+		"@typescript-eslint/eslint-plugin": "^8.34.0",
+		"drizzle-kit": "^0.31.1",
+		"eslint": "^9.28.0",
+		"eslint-import-resolver-node": "^0.3.9",
 		"jiti": "^2.4.2",
-		"nuxt": "^3.15.3",
+		"nuxt": "^3.17.5",
 		"nuxt-openapi-docs-module": "5.3.1",
-		"sass": "^1.83.4",
-		"type-fest": "^4.33.0",
-		"typescript": "^5.7.3",
-		"vue-tsc": "^2.2.0"
+		"openapi-typescript": "^7.8.0",
+		"riot-games-fetch-typed": "^2.2.1",
+		"sass": "^1.89.2",
+		"tsx": "^4.20.2",
+		"type-fest": "^4.41.0",
+		"typescript": "^5.8.3",
+		"vite-plugin-devtools-json": "^0.2.0",
+		"vue-tsc": "^2.2.10"
 	},
 	"pnpm": {
 		"peerDependencyRules": {
 			"allowedVersions": {
 				"vue-tsc": "^2.2.0"
 			}
+		},
+		"patchedDependencies": {
+			"riot-games-fetch-typed": "patches/riot-games-fetch-typed.patch"
 		}
 	},
 	"packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"

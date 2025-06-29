@@ -12,7 +12,10 @@ const languageOptions = {
 
 export default withNuxt()
 	.prepend({
-		ignores: ['types/database-generated.types.ts'],
+		ignores: [
+			'types/database-generated.types.ts',
+			'types/riot_schema.d.ts',
+		],
 	})
 	// @ts-expect-error - We are mixing two libraries but this works
 	.append(...tseslint.configs.strictTypeChecked.toSpliced(0, 1), tseslint.configs.stylisticTypeChecked[2])
