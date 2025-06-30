@@ -1,4 +1,4 @@
-# TournamentStats Frontend
+# TournamentStats
 
 Frontend for "TournamentStats", a website that allows League of Legends players to create Statpages for their tournaments. This repository includes the nuxt frontend as well as an included nitro server that queries the postgresql database.
 
