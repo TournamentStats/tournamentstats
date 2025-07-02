@@ -21,14 +21,17 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user!
 		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
+		let deletedTournament
 		try {
-			await db.delete(tournament)
+			deletedTournament = await db.delete(tournament)
 				.where(
 					and(
 						eq(tournament.shortId, tournamentId),
 						hasTournamentDeletePermissions(user),
 					),
 				)
+				.returning({ shortId: tournament.shortId })
+				.then(maybeSingle)
 		}
 		catch (e: unknown) {
 			if (e instanceof Error) {
@@ -37,10 +40,14 @@ export default defineEventHandler({
 			throw createGenericError()
 		}
 
+		if (!deletedTournament) {
+			throw createNotFoundError('Tournament')
+		}
+
 		// theoretical we can return here and execute the deletion in the background
 		sendNoContent(event)
 
 		// fire and forget image deletion
-		void deleteTournamentImages(event, tournamentId)
+		void deleteTournamentImages(event, deletedTournament.shortId)
 	},
 })

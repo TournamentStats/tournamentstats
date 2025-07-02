@@ -65,7 +65,7 @@ export default defineEventHandler({
 		if (!updatedTournament) {
 			throw createNotFoundError('Tournament')
 		}
-		let imageUrl: string | undefined
+		let imageUrl = null
 		if (imageId) {
 			imageUrl = (await moveTournamentImage(event, imageId, updatedTournament.tournamentId)).signedUrl
 		}

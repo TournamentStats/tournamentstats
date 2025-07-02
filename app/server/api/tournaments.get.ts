@@ -1,5 +1,4 @@
-import { eq, getTableColumns, or } from 'drizzle-orm'
-import { isOwner } from '@utils/drizzle/utils'
+import { getTableColumns } from 'drizzle-orm'
 import { getSignedTournamentImage } from '@utils/supabase/images'
 
 /**
@@ -16,14 +15,6 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user
 
-		const filters = [
-			eq(tournament.isPrivate, false),
-		]
-
-		if (user) {
-			filters.push(isOwner(user))
-		}
-
 		// remove shortId and createdAt from result
 		// assign tournamentId our short id alias
 		const { shortId, createdAt, ...rest } = getTableColumns(tournament)
@@ -34,7 +25,7 @@ export default defineEventHandler({
 		})
 			.from(tournament)
 			.where(
-				or(...filters),
+				hasTournamentViewPermissions(user),
 			)
 
 		const tournamentsWithImages = await Promise.all(

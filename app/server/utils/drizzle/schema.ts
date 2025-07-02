@@ -143,7 +143,7 @@ export const matchup = pgTable('matchup', {
 	team1Id: integer('team1_id').notNull(),
 	team2Id: integer('team2_id').notNull(),
 	format: format(),
-	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(matchup_id, private.get_salt('matchup'::text))`).notNull(),
+	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(matchup_id, private.get_salt('matchup'::text))`).notNull().unique(),
 }, table => [
 	index('index_matchup_tournamentid').using('btree', table.tournamentId.asc().nullsLast().op('int4_ops')),
 	index('index_matchup_tournamentid_team1id').using('btree', table.tournamentId.asc().nullsLast().op('int4_ops'), table.team1Id.asc().nullsLast().op('int4_ops')),
@@ -181,7 +181,7 @@ export const team = pgTable('team', {
 	tournamentId: integer('tournament_id').notNull(),
 	name: text().notNull(),
 	shorthand: text(),
-	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(team_id, private.get_salt('team'::text))`).notNull(),
+	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(team_id, private.get_salt('team'::text))`).notNull().unique(),
 }, table => [
 	index('index_team_tournamentid').using('btree', table.tournamentId.asc().nullsLast().op('int4_ops')),
 	foreignKey({
@@ -200,7 +200,7 @@ export const tournament = pgTable('tournament', {
 	startDate: date('start_date'),
 	endDate: date('end_date'),
 	isPrivate: boolean('is_private').notNull(),
-	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(tournament_id, private.get_salt('tournament'::text))`).notNull(),
+	shortId: text('short_id').generatedAlwaysAs(sql`encode_id_salted(tournament_id, private.get_salt('tournament'::text))`).notNull().unique(),
 }, table => [
 	index('index_tournament_ownerid').using('btree', table.ownerId.asc().nullsLast().op('uuid_ops')),
 	foreignKey({

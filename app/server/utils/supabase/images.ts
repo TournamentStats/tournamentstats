@@ -61,7 +61,7 @@ export async function getSignedURL(event: H3Event, imagePath: string, duration: 
 
 	if (signedUrlResponse.error) {
 		event.context.errors.push(signedUrlResponse.error)
-		return undefined
+		return null
 	}
 
 	return signedUrlResponse.data.signedUrl

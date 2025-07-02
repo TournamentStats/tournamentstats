@@ -6,10 +6,10 @@ export function createGenericError({ statusCode, statusMessage, message }: { sta
 	})
 }
 
-export function createNotFoundError(resource: string) {
+export function createNotFoundError(resource: string, extra?: string) {
 	return createError({
 		statusCode: 404,
 		statusMessage: 'Not Found',
-		statusText: `${resource} not found`,
+		statusText: `${resource} not found${extra != undefined ? ` ${extra}` : ''}`,
 	})
 }

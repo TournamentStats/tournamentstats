@@ -25,31 +25,31 @@ export default defineEventHandler({
 	handler: async (event) => {
 		const user = event.context.auth.user!
 
-		const body = await readValidatedBody(event, data => requestBody.parse(data))
+		const { name, isPrivate, imageId } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const insertedTournament = await db.transaction(async (tx) => {
 			const { shortId, createdAt, ...rest } = getTableColumns(tournament)
 
 			const insertedTournament = await tx.insert(tournament)
 				.values({
-					name: body.name,
-					isPrivate: body.isPrivate,
+					name,
+					isPrivate,
 					ownerId: user.id,
 				})
 				.returning({ ...rest, id: tournament.shortId })
 				.then(single)
 
-			const result: Simplify<typeof insertedTournament & { imageUrl?: string }> = insertedTournament
-
-			if (body.imageId) {
-				result.imageUrl = (await moveTournamentImage(event, body.imageId, insertedTournament.id)).signedUrl
+			let imageUrl = null
+			if (imageId) {
+				imageUrl = (await moveTournamentImage(event, imageId, insertedTournament.id)).signedUrl
 			}
 
-			return result
+			return {
+				...insertedTournament,
+				imageUrl,
+			}
 		})
 
 		return insertedTournament
 	},
 })
-
-type Simplify<T> = { [K in keyof T]: T[K] } & {}

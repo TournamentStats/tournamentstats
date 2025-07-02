@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js'
-import { eq, or } from 'drizzle-orm'
+import { and, eq, or } from 'drizzle-orm'
 
 export function maybeSingle<T>(values: T[]): T | undefined {
 	if (values.length > 1) throw new Error('Found non unique value')
@@ -30,10 +30,37 @@ export function hasTournamentViewPermissions(user: User | null) {
 	return or(...filters)
 }
 
+export async function checkTournamentViewPermission(user: User, tournamentId: string): Promise<boolean> {
+	const res = await db
+		.select()
+		.from(tournament)
+		.where(and(eq(tournament.shortId, tournamentId), hasTournamentViewPermissions(user)))
+		.limit(1)
+	return res.length > 0
+}
+
 export function hasTournamentDeletePermissions(user: User) {
 	return isOwner(user)
 }
 
+export async function checkTournamentDeletePermission(user: User, tournamentId: string): Promise<boolean> {
+	const res = await db
+		.select()
+		.from(tournament)
+		.where(and(eq(tournament.shortId, tournamentId), hasTournamentDeletePermissions(user)))
+		.limit(1)
+	return res.length > 0
+}
+
 export function hasTournamentModifyPermissions(user: User) {
 	return isOwner(user)
+}
+
+export async function checkTournamentModifyPermission(user: User, tournamentId: string): Promise<boolean> {
+	const res = await db
+		.select()
+		.from(tournament)
+		.where(and(eq(tournament.shortId, tournamentId), hasTournamentModifyPermissions(user)))
+		.limit(1)
+	return res.length > 0
 }
