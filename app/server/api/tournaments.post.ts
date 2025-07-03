@@ -30,14 +30,23 @@ export default defineEventHandler({
 		const insertedTournament = await db.transaction(async (tx) => {
 			const { shortId, createdAt, ...rest } = getTableColumns(tournament)
 
-			const insertedTournament = await tx.insert(tournament)
-				.values({
-					name,
-					isPrivate,
-					ownerId: user.id,
-				})
-				.returning({ ...rest, id: tournament.shortId })
-				.then(single)
+			let insertedTournament
+			try {
+				insertedTournament = await tx.insert(tournament)
+					.values({
+						name,
+						isPrivate,
+						ownerId: user.id,
+					})
+					.returning({ ...rest, id: tournament.shortId })
+					.then(single)
+			}
+			catch (e: unknown) {
+				if (e instanceof Error) {
+					event.context.errors.push(e)
+				}
+				throw createGenericError()
+			}
 
 			let imageUrl = null
 			if (imageId) {
@@ -45,8 +54,8 @@ export default defineEventHandler({
 			}
 
 			return {
-				...insertedTournament,
 				imageUrl,
+				...insertedTournament,
 			}
 		})
 

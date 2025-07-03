@@ -18,19 +18,28 @@ export default defineEventHandler({
 		// remove shortId and createdAt from result
 		// assign tournamentId our short id alias
 		const { shortId, createdAt, ...rest } = getTableColumns(tournament)
-
-		const tournaments = await db.select({
-			...rest,
-			tournamentId: tournament.shortId,
-		})
-			.from(tournament)
-			.where(
-				hasTournamentViewPermissions(user),
-			)
+		let selectedTournaments
+		try {
+			selectedTournaments = await db.select({
+				...rest,
+				tournamentId: tournament.shortId,
+			})
+				.from(tournament)
+				.where(
+					hasTournamentViewPermissions(user),
+				)
+		}
+		catch (e: unknown) {
+			if (e instanceof Error) {
+				event.context.errors.push(e)
+			}
+			throw createGenericError()
+		}
 
 		const tournamentsWithImages = await Promise.all(
-			tournaments.map(async t => ({
-				...t, imageUrl: await getSignedTournamentImage(event, t.tournamentId),
+			selectedTournaments.map(async t => ({
+				imageUrl: await getSignedTournamentImage(event, t.tournamentId),
+				...t,
 			})),
 		)
 

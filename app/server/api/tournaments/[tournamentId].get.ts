@@ -51,8 +51,8 @@ export default defineEventHandler({
 		const imageUrl = await getSignedTournamentImage(event, selectedTournament.tournamentId)
 
 		return {
-			...selectedTournament,
 			imageUrl,
+			...selectedTournament,
 		}
 	},
 })

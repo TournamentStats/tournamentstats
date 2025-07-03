@@ -60,6 +60,9 @@ export default defineNuxtConfig({
 		imports: {
 			dirs: ['server/utils'],
 		},
+		experimental: {
+			openAPI: true,
+		},
 	},
 
 	vite: {

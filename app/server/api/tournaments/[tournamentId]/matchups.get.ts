@@ -20,7 +20,7 @@ export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
-	handler: (event) => {
-		return event.toString()
+	handler: async (event) => {
+		const x = await db.select().from(tournamentParticipant)
 	},
 })

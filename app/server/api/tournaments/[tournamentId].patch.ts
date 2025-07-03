@@ -34,45 +34,49 @@ export default defineEventHandler({
 		const { name, isPrivate, startDate, endDate, imageId } = await readValidatedBody(event, obj => requestBody.parse(obj))
 
 		const { shortId, createdAt, ...rest } = getTableColumns(tournament)
-		let updatedTournament
-		try {
-			updatedTournament = await db.update(tournament)
-				.set({
-					name,
-					isPrivate,
-					startDate: startDate?.toUTCString(),
-					endDate: endDate?.toUTCString(),
-				})
-				.where(
-					and(
-						eq(tournament.shortId, tournamentId),
-						hasTournamentModifyPermissions(user),
-					),
-				)
-				.returning({
-					...rest,
-					tournamentId: tournament.shortId,
-				})
-				.then(maybeSingle)
-		}
-		catch (e: unknown) {
-			if (e instanceof Error) {
-				event.context.errors.push(e)
+		const updatedTournament = await db.transaction(async (tx) => {
+			let updatedTournament
+			try {
+				updatedTournament = await tx.update(tournament)
+					.set({
+						name,
+						isPrivate,
+						startDate: startDate?.toUTCString(),
+						endDate: endDate?.toUTCString(),
+					})
+					.where(
+						and(
+							eq(tournament.shortId, tournamentId),
+							hasTournamentModifyPermissions(user),
+						),
+					)
+					.returning({
+						...rest,
+						tournamentId: tournament.shortId,
+					})
+					.then(maybeSingle)
 			}
-			throw createGenericError()
-		}
+			catch (e: unknown) {
+				if (e instanceof Error) {
+					event.context.errors.push(e)
+				}
+				throw createGenericError()
+			}
 
-		if (!updatedTournament) {
-			throw createNotFoundError('Tournament')
-		}
-		let imageUrl = null
-		if (imageId) {
-			imageUrl = (await moveTournamentImage(event, imageId, updatedTournament.tournamentId)).signedUrl
-		}
+			if (!updatedTournament) {
+				throw createNotFoundError('Tournament')
+			}
 
-		return {
-			...updatedTournament,
-			imageUrl,
-		}
+			let imageUrl = null
+			if (imageId) {
+				imageUrl = (await moveTournamentImage(event, imageId, updatedTournament.tournamentId)).signedUrl
+			}
+
+			return {
+				imageUrl,
+				...updatedTournament,
+			}
+		})
+		return updatedTournament
 	},
 })

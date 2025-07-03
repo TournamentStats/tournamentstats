@@ -32,34 +32,43 @@ export default defineEventHandler({
 		const { name, shorthand, imageId } = await readValidatedBody(event, obj => requestBody.parse(obj))
 
 		const createdTeam = await db.transaction(async (tx) => {
-			const insertedTeam = db.$with('inserted_team').as(
-				tx.insert(team)
-					.select(
-						tx.select({
-							tournamentId: tournament.tournamentId,
-							name: sql<string>`${name}`.as('name'),
-							shorthand: sql<string | null>`${shorthand ?? null}`.as('shorthand'),
-						})
-							.from(tournament)
-							.where(
-								and(
-									eq(tournament.shortId, tournamentId),
-									hasTournamentModifyPermissions(user),
+			let createdTeam
+			try {
+				const insertedTeam = db.$with('inserted_team').as(
+					tx.insert(team)
+						.select(
+							tx.select({
+								tournamentId: tournament.tournamentId,
+								name: sql<string>`${name}`.as('name'),
+								shorthand: sql<string | null>`${shorthand ?? null}`.as('shorthand'),
+							})
+								.from(tournament)
+								.where(
+									and(
+										eq(tournament.shortId, tournamentId),
+										hasTournamentModifyPermissions(user),
+									),
 								),
-							),
-					)
-					.returning(),
-			)
-			const createdTeam = await tx.with(insertedTeam)
-				.select({
-					teamId: insertedTeam.shortId,
-					tournamentId: tournament.shortId,
-					name: insertedTeam.name,
-					shorthand: insertedTeam.shorthand,
-				})
-				.from(insertedTeam)
-				.innerJoin(tournament, eq(insertedTeam.tournamentId, tournament.tournamentId))
-				.then(maybeSingle)
+						)
+						.returning(),
+				)
+				createdTeam = await tx.with(insertedTeam)
+					.select({
+						teamId: insertedTeam.shortId,
+						tournamentId: tournament.shortId,
+						name: insertedTeam.name,
+						shorthand: insertedTeam.shorthand,
+					})
+					.from(insertedTeam)
+					.innerJoin(tournament, eq(insertedTeam.tournamentId, tournament.tournamentId))
+					.then(maybeSingle)
+			}
+			catch (e: unknown) {
+				if (e instanceof Error) {
+					event.context.errors.push(e)
+				}
+				throw createGenericError()
+			}
 
 			if (!createdTeam) {
 				throw createNotFoundError('Tournament')
@@ -69,11 +78,13 @@ export default defineEventHandler({
 			if (imageId) {
 				imageUrl = (await moveTeamImage(event, imageId, createdTeam.tournamentId, createdTeam.teamId)).signedUrl
 			}
+
 			return {
-				...createdTeam,
 				imageUrl,
+				...createdTeam,
 			}
 		})
+
 		return createdTeam
 	},
 })

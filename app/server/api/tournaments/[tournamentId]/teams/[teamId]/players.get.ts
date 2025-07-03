@@ -1,4 +1,10 @@
 import { z } from 'zod'
+import { and, eq } from 'drizzle-orm'
+
+const pathParams = z.object({
+	tournamentId: z.string().min(1),
+	teamId: z.string().min(1),
+})
 
 const puuid = z.string().length(78)
 
@@ -25,24 +31,51 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: async (event) => {
-		const tournamentShortId = getRouterParam(event, 'tournamentId')
-		if (!tournamentShortId) {
-			throw createError({
-				statusCode: 400,
-				statusMessage: 'Bad Request',
-				message: 'No tournament id given',
-			})
-		}
+		const user = event.context.auth.user!
 
-		const teamShortId = getRouterParam(event, 'teamId')
-		if (!teamShortId) {
-			throw createError({
-				statusCode: 400,
-				statusMessage: 'Bad Request',
-				message: 'No team id given',
-			})
-		}
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
+		const { add, remove } = await readValidatedBody(event, data => requestBody.parse(data))
 
-		const _ = await readValidatedBody(event, data => requestBody.parse(data))
+		await db.transaction(async (tx) => {
+			if (add.length > 0) {
+				await tx.insert(tournamentParticipant)
+					.select(
+						tx.select({
+							puuid: sql<string>`EXCLUDED.puuid`.as('puuid'),
+							tournamentId: sql<number>`EXCLUDED.tournament_id`.as('tournamentId'),
+							name: sql<string>`EXCLUDED.name`.as('name'),
+							teamId: sql<number | null>`EXCLUDED.team_id`.as('teamId'),
+						})
+							.from(tournamentParticipant)
+							.where(
+								and(
+									eq(tournamentParticipant.tournamentId, tournamentId),
+									eq(tournamentParticipant.teamId, teamId),
+								),
+							)
+					.onConflictDoUpdate({
+						target: [
+							tournamentParticipant.puuid,
+							tournamentParticipant.tournamentId,
+							tournamentParticipant.name,
+							tournamentParticipant.teamId,
+						],
+						set: {
+							name: sql`EXCLUDED.name`
+						}
+					})
+			}
+
+			if (remove.length > 0) {
+				await tx.delete(teamPlayer)
+					.where(
+						and(
+							eq(teamPlayer.tournamentId, tournamentId),
+							eq(teamPlayer.teamId, teamId),
+							eq(teamPlayer.puuid, remove),
+						),
+					)
+			}
+		}
 	},
 })
