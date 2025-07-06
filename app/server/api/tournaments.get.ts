@@ -1,6 +1,14 @@
 import { getTableColumns } from 'drizzle-orm'
 import { getSignedTournamentImage } from '@utils/supabase/images'
 
+defineRouteMeta({
+	openAPI: {
+		tags: ['tournament'],
+		description: 'Gets all Tournaments the authenticated user can see, that means public tournaments and tournaments the user is invited to.',
+		security: [{ authentication: [] }],
+	},
+})
+
 /**
  * GET /api/tournaments
  *

@@ -1,1 +1,1 @@
-export default defineEventHandler(ratelimit(true))
+export default defineEventHandler(ratelimit())

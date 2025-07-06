@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 import { and, eq, sql } from 'drizzle-orm'
 
@@ -34,7 +34,7 @@ export default defineEventHandler({
 		const createdTeam = await db.transaction(async (tx) => {
 			let createdTeam
 			try {
-				const insertedTeam = db.$with('inserted_team').as(
+				const insertedTeam = tx.$with('inserted_team').as(
 					tx.insert(team)
 						.select(
 							tx.select({
@@ -80,8 +80,8 @@ export default defineEventHandler({
 			}
 
 			return {
-				imageUrl,
 				...createdTeam,
+				imageUrl,
 			}
 		})
 

@@ -1,4 +1,5 @@
-import { z } from 'zod'
+import * as z from 'zod/v4'
+
 import { hasTournamentViewPermissions, maybeSingle } from '@utils/drizzle/utils'
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { getSignedTournamentImage } from '@utils/supabase/images'

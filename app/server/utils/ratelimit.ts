@@ -16,7 +16,7 @@ interface Ratelimit {
 	store: Map<string, LimitExhaust[]>
 }
 
-const myLimit: Ratelimit = {
+const globalRatelimit: Ratelimit = {
 	limits: [
 		{
 			interval: 1,
@@ -30,13 +30,20 @@ const myLimit: Ratelimit = {
 	store: new Map<string, LimitExhaust[]>(),
 }
 
-export function ratelimit(allow_ips: boolean) {
+interface RatelimitOptions {
+	allowIpAddresses?: boolean
+	ratelimit?: Ratelimit
+}
+
+export function ratelimit(options: RatelimitOptions = {}) {
+	const allowIpAddresses = options.allowIpAddresses ?? true
+	const ratelimit = options.ratelimit ?? globalRatelimit
 	return (event: H3Event) => {
-		if (!event.path.startsWith('/api')) {
+		if (!event.path.startsWith('/api') || event.path.startsWith('/api/docs')) {
 			return
 		}
 
-		if (event.context.auth.user == null && !allow_ips) {
+		if (event.context.auth.user == null && !allowIpAddresses) {
 			throw createError({
 				status: 401,
 				message: 'Unauthorized',
@@ -65,21 +72,21 @@ export function ratelimit(allow_ips: boolean) {
 		}
 
 		const now = new Date()
-		let bucket = myLimit.store.get(identifier)
+		let bucket = ratelimit.store.get(identifier)
 
 		if (!bucket) {
-			bucket = myLimit.limits.map(
+			bucket = ratelimit.limits.map(
 				limit => ({
 					remaining: limit.limit,
 					lastUpdated: now,
 				}),
 			)
-			myLimit.store.set(identifier, bucket)
+			ratelimit.store.set(identifier, bucket)
 		}
 
 		const exhausted = []
 
-		for (const [limit, rem] of zip(myLimit.limits, bucket)) {
+		for (const [limit, rem] of zip(ratelimit.limits, bucket)) {
 			// reset bucket when interval elapsed
 			if (now.getTime() - rem.lastUpdated.getTime() >= limit.interval * 1000) {
 				rem.remaining = limit.limit

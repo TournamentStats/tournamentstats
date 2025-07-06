@@ -1,7 +1,7 @@
 /**
  * Accepts a puuid and updates the database with riot api information (name, summoner icon)
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 const _ = z.string().length(78)
 

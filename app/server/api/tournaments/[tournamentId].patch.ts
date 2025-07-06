@@ -1,5 +1,6 @@
 import { and, eq, getTableColumns } from 'drizzle-orm'
-import { z } from 'zod'
+import * as z from 'zod/v4'
+
 import { hasTournamentModifyPermissions, maybeSingle } from '@utils/drizzle/utils'
 
 const pathParams = z.object({

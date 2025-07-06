@@ -33,6 +33,9 @@ export default defineNuxtConfig({
 	css: ['normalize.css', '~/assets/main.scss', '~/assets/fonts.scss'],
 
 	runtimeConfig: {
+		databaseURL: '',
+		siteURL: '',
+		backendBaseURL: '',
 		riotGamesApiKey: '',
 	},
 
@@ -62,6 +65,22 @@ export default defineNuxtConfig({
 		},
 		experimental: {
 			openAPI: true,
+		},
+		openAPI: {
+			meta: {
+				title: 'TournamentStats',
+				description: 'REST API for accessing and modifying tournaments, teams, player and all their stats.',
+				version: '1.0',
+			},
+			route: '/_docs/openapi.json',
+			production: 'prerender',
+			ui: {
+				scalar: {
+					theme: 'default',
+					layout: 'modern',
+					route: '/api/docs',
+				},
+			},
 		},
 	},
 
@@ -95,5 +114,11 @@ export default defineNuxtConfig({
 
 	supabase: {
 		redirect: false,
+		clientOptions: {
+			auth: {
+				flowType: 'pkce',
+			},
+		},
+		cookiePrefix: 'tstats-auth',
 	},
 })

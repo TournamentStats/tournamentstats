@@ -1,5 +1,6 @@
 import { eq, and } from 'drizzle-orm'
-import { z } from 'zod'
+import * as z from 'zod/v4'
+
 import { hasTournamentDeletePermissions } from '@utils/drizzle/utils'
 
 const pathParams = z.object({

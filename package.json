@@ -13,24 +13,24 @@
 		"gen-db-types": "supabase --workdir ../backend gen types --local --schema public,storage > ./types/database-generated.types.ts"
 	},
 	"dependencies": {
-		"@supabase/postgrest-js": "^1.19.4",
-		"@supabase/supabase-js": "^2.50.2",
+		"@supabase/supabase-js": "^2.50.3",
 		"dotenv": "^17.0.1",
 		"drizzle-orm": "^0.44.2",
 		"logform": "^2.7.0",
 		"normalize.css": "^8.0.1",
 		"postgres": "^3.4.7",
+		"riot-games-fetch-typed": "^2.2.1",
 		"sharp": "^0.34.2",
 		"sqids": "^0.3.0",
-		"typescript-eslint": "^8.35.1",
 		"vue": "^3.5.17",
 		"vue-router": "^4.5.1",
 		"winston": "^3.17.0",
-		"zod": "^3.25.67"
+		"zod": "^3.25.74"
 	},
 	"devDependencies": {
+		"@asteasolutions/zod-to-openapi": "8.0.0-beta.4",
 		"@eslint/config-inspector": "^1.1.0",
-		"@nuxt/eslint": "1.5.0",
+		"@nuxt/eslint": "1.5.2",
 		"@nuxtjs/supabase": "^1.5.3",
 		"@types/node": "^24.0.10",
 		"@typescript-eslint/eslint-plugin": "^8.35.1",
@@ -41,13 +41,13 @@
 		"nuxt": "^3.17.6",
 		"nuxt-openapi-docs-module": "5.3.1",
 		"openapi-typescript": "^7.8.0",
-		"riot-games-fetch-typed": "^2.2.1",
 		"sass": "^1.89.2",
 		"tsx": "^4.20.3",
 		"type-fest": "^4.41.0",
 		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.35.1",
 		"vite-plugin-devtools-json": "^0.2.1",
-		"vue-tsc": "^3.0.0"
+		"vue-tsc": "^3.0.1"
 	},
 	"pnpm": {
 		"peerDependencyRules": {

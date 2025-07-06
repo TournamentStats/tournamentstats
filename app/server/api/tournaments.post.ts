@@ -1,4 +1,5 @@
-import { z } from 'zod'
+import * as z from 'zod/v4'
+
 import { getTableColumns } from 'drizzle-orm'
 import { single } from '@utils/drizzle/utils'
 

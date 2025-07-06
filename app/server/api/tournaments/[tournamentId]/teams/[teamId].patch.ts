@@ -1,5 +1,5 @@
 import { and, eq, getTableColumns } from 'drizzle-orm'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
@@ -12,13 +12,6 @@ const requestBody = z.object({
 	imageId: z.string().optional(),
 })
 
-/**
- * PATCH /api/tournaments/[tournamentId]/teams/[teamId]
- *
- * Patches a team in the tournament
- *
- * ReturnBody: team
- */
 export default defineEventHandler({
 	onRequest: [
 		authentication,
