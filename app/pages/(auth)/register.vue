@@ -80,7 +80,7 @@ async function handleDiscordLogin() {
 	const { error } = await supabase.auth.signInWithOAuth({
 		provider: 'discord',
 		options: {
-			redirectTo: 'http://localhost:3000/confirm?redirectTo=' + encodeURIComponent(redirect),
+			redirectTo: 'https://localhost:3000/callback', // ?redirectTo=' + encodeURIComponent(redirect),
 		},
 	})
 	if (error) {

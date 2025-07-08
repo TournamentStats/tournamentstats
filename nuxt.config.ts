@@ -33,13 +33,14 @@ export default defineNuxtConfig({
 	css: ['normalize.css', '~/assets/main.scss', '~/assets/fonts.scss'],
 
 	runtimeConfig: {
+		alphabets: {
+			imageIds: '',
+		},
 		databaseURL: '',
 		siteURL: '',
 		backendBaseURL: '',
 		riotGamesApiKey: '',
 	},
-
-	srcDir: 'app/',
 
 	alias: {
 		'~': resolve(__dirname, 'app'),
@@ -57,9 +58,31 @@ export default defineNuxtConfig({
 		transpile: ['riot-games-fetch-typed'],
 	},
 
+	devServer: {
+		https: {
+			key: './localhost.key',
+			cert: './localhost.crt',
+		},
+	},
+	future: {
+		compatibilityVersion: 4,
+	},
+
 	compatibilityDate: '2025-06-09',
 
 	nitro: {
+		typescript: {
+			tsConfig: {
+				compilerOptions: {
+					strict: true,
+					strictNullChecks: true,
+					noImplicitAny: true,
+					noImplicitThis: true,
+					alwaysStrict: true,
+					noUncheckedIndexedAccess: true,
+				},
+			},
+		},
 		imports: {
 			dirs: ['server/utils'],
 		},
@@ -72,13 +95,14 @@ export default defineNuxtConfig({
 				description: 'REST API for accessing and modifying tournaments, teams, player and all their stats.',
 				version: '1.0',
 			},
-			route: '/_docs/openapi.json',
+			route: '/api/docs/openapi.json',
 			production: 'prerender',
 			ui: {
 				scalar: {
 					theme: 'default',
 					layout: 'modern',
 					route: '/api/docs',
+
 				},
 			},
 		},
@@ -100,6 +124,7 @@ export default defineNuxtConfig({
 				noImplicitAny: true,
 				noImplicitThis: true,
 				alwaysStrict: true,
+				noUncheckedIndexedAccess: true,
 			},
 		},
 	},
@@ -117,6 +142,7 @@ export default defineNuxtConfig({
 		clientOptions: {
 			auth: {
 				flowType: 'pkce',
+				storageKey: 'tstats-auth',
 			},
 		},
 		cookiePrefix: 'tstats-auth',

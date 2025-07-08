@@ -29,13 +29,7 @@ defineProps<{
 }>()
 
 function onFileChange(e: Event) {
-	const files = (e.target as HTMLInputElement).files
-	if (!files?.length) {
-		file.value = null
-	}
-	else {
-		file.value = files[0]
-	}
+	file.value = (e.target as HTMLInputElement).files?.[0] ?? null
 }
 </script>
 

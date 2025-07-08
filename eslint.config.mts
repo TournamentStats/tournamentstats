@@ -1,8 +1,9 @@
 // @ts-check
 import tseslint from 'typescript-eslint'
 import withNuxt from './.nuxt/eslint.config.mjs'
+import type { Linter } from 'eslint'
 
-const languageOptions = {
+const languageOptions: Linter.LanguageOptions = {
 	parserOptions: {
 		parser: tseslint.parser,
 		projectService: true,

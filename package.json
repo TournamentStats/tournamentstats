@@ -25,7 +25,8 @@
 		"vue": "^3.5.17",
 		"vue-router": "^4.5.1",
 		"winston": "^3.17.0",
-		"zod": "^3.25.74"
+		"zod": "^3.25.76",
+		"zod-openapi": "^5.0.1"
 	},
 	"devDependencies": {
 		"@asteasolutions/zod-to-openapi": "8.0.0-beta.4",
@@ -45,7 +46,7 @@
 		"tsx": "^4.20.3",
 		"type-fest": "^4.41.0",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.35.1",
+		"typescript-eslint": "^8.36.0",
 		"vite-plugin-devtools-json": "^0.2.1",
 		"vue-tsc": "^3.0.1"
 	},
@@ -58,6 +59,9 @@
 		"patchedDependencies": {
 			"riot-games-fetch-typed": "patches/riot-games-fetch-typed.patch",
 			"drizzle-orm": "patches/drizzle-orm.patch"
+		},
+		"overrides": {
+			"esbuild@<=0.24.2": ">=0.25.0"
 		}
 	},
 	"packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"

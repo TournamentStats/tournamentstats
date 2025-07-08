@@ -57,21 +57,12 @@ export function UseFile(
 				dragCounter = 0
 				console.log('drope')
 				isDragging.value = false
-				const files = e.dataTransfer?.files
-				if (files?.length) {
-					file.value = files[0]
-				}
+				file.value = e.dataTransfer?.files[0] ?? null
 			})
 		}
 
 		inputElement.value?.addEventListener('change', (e) => {
-			const files = (e.target as HTMLInputElement).files
-			if (files?.length) {
-				file.value = files[0]
-			}
-			else {
-				file.value = null
-			}
+			file.value = inputElement.value?.files?.[0] ?? null
 		})
 	})
 
