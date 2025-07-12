@@ -14,8 +14,7 @@ export function createNotFoundError(resource: string, extra?: string) {
 	return createError({
 		statusCode: 404,
 		statusMessage: 'Not Found',
-		statusText: `${resource} not found${extra != undefined ? ` ${extra}` : ''}`,
-		message: 'What should come in here?',
+		message: `${resource} not found${extra != undefined ? ` ${extra}` : ''}`,
 	})
 }
 
@@ -64,6 +63,9 @@ export function withErrorHandling<ReturnData>(
 				if (e instanceof H3Error) {
 					errorData.statusCode = e.statusCode
 					errorData.statusMessage = e.statusMessage
+					errorData.error = {
+						message: e.message,
+					}
 				}
 
 				// fill error details manually

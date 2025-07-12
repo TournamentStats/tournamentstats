@@ -84,7 +84,10 @@ export default defineNuxtConfig({
 			},
 		},
 		imports: {
-			dirs: ['server/utils'],
+			dirs: [
+				'server/utils',
+				'server/utils/auth',
+			],
 		},
 		experimental: {
 			openAPI: true,

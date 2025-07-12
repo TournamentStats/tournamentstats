@@ -1,6 +1,6 @@
 import * as z from 'zod/v4'
 
-import { and, eq, or, inArray, sql } from 'drizzle-orm'
+import { and, eq, or, inArray, sql, exists, notExists } from 'drizzle-orm'
 
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
@@ -387,19 +387,34 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!
-
+		const user = await requireAuthorization(event)
 		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj))
 		const { add, remove } = await readValidatedBody(event, data => RequestBody.parse(data))
 
 		const puuids = [...(add?.map(p => p.puuid) ?? []), ...(remove ?? [])]
 
 		// check if there a puuids not in our system
-		const s = db.select()
-			.from(sql`unnest(${puuids}) puuid`)
-			.leftJoin(player, eq(player.puuid, sql`puuid`))
+		const missingPuuids = await db.select({
+			puuid: sql<string>`puuid`.as('puuid'),
+		})
+			.from(sql`unnest(${puuids}) AS needed_puuids(puuid)`)
+			.where(
+				notExists(
+					db.select({
+						1: sql`1`,
+					})
+						.from(player)
+						.where(
+							eq(player.puuid, sql`needed_puuids.puuid`),
+						),
+				),
+			)
 
-		console.log(s.getSQL())
+		await Promise.all(
+			missingPuuids.map(
+				o => riotFetch('p'),
+			),
+		)
 
 		const added = []
 		const removed = []
@@ -464,3 +479,12 @@ export default defineEventHandler({
 		})
 	}),
 })
+
+async function fetchPlayer(puuid: string) {
+	const account = await riotFetch(`/riot/account/v1/accounts/by-puuid/${puuid}`, {
+		region: 'europe',
+	})
+	const summoner = await riotFetch(`/lol/summoner/v4/summoners/by-puuid/${puuid}`, {
+		region,
+	})
+}
