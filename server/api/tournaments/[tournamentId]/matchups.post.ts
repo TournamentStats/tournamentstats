@@ -1,6 +1,6 @@
 import * as z from 'zod/v4'
 
-import { Format } from '~~/types/database.types'
+import { Format } from '~~/@types/database.types'
 
 const teamId = z.string()
 

@@ -7,6 +7,7 @@ const requestBody = z.object({
 	name: z.string().min(3).max(32),
 	isPrivate: z.boolean(),
 	imageId: z.string().optional(),
+	region: z.enum(regions),
 })
 
 /**
@@ -23,7 +24,7 @@ export default defineEventHandler({
 	handler: withErrorHandling(async (event) => {
 		const user = event.context.auth.user!
 
-		const { name, isPrivate, imageId } = await readValidatedBody(event, data => requestBody.parse(data))
+		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => requestBody.parse(data))
 
 		const insertedTournament = await db.transaction(async (tx) => {
 			const { shortId, createdAt, ...rest } = getTableColumns(tournament)
@@ -33,6 +34,7 @@ export default defineEventHandler({
 					name,
 					isPrivate,
 					ownerId: user.id,
+					region,
 				})
 				.returning({ ...rest, id: tournament.shortId })
 				.then(single)

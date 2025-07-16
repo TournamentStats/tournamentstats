@@ -2,6 +2,8 @@ import { pgTable, text, index, foreignKey, bigint, integer, smallint, timestamp,
 import { sql } from 'drizzle-orm'
 
 export const format = pgEnum('format', ['Best of 1', 'Best of 2', 'Best of 3', 'Best of 5', 'Other'])
+export const regions = ['br1', 'eun1', 'euw1', 'jp1', 'kr', 'la1', 'la2', 'me1', 'na1', 'oc1', 'ph2', 'ru', 'sg2', 'th2', 'tr1', 'tw2', 'vn2'] as const
+export const region = pgEnum('region', regions)
 export const side = pgEnum('side', ['BLUE', 'RED'])
 
 export const usersInAuth = pgTable('users', {
@@ -348,8 +350,9 @@ export const player = pgTable('player', {
 		.default(sql`CURRENT_TIMESTAMP`)
 		.notNull(),
 	profileIconId: integer('profile_icon_id').notNull(),
-	gameName: text('game_name').notNull(),
-	tagLine: text('tag_line').notNull(),
+	gameName: text('game_name'),
+	tagLine: text('tag_line'),
+	region: region().notNull(),
 })
 
 export const team = pgTable('team', {
@@ -422,6 +425,7 @@ export const tournament = pgTable('tournament', {
 	startDate: date('start_date'),
 	endDate: date('end_date'),
 	isPrivate: boolean('is_private').notNull(),
+	region: region().notNull(),
 }, table => [
 	index('index_tournament_ownerid').using('btree',
 		table.ownerId.asc()

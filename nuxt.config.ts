@@ -52,7 +52,8 @@ export default defineNuxtConfig({
 		'public': resolve(__dirname, 'public'),
 		'#build': resolve(__dirname, '.nuxt'),
 		'#internal/nuxt/paths': resolve(__dirname, '.nuxt/paths.mjs'),
-		'@utils': resolve(__dirname, 'app/server/utils'),
+		'@server': resolve(__dirname, 'server'),
+		'@types': resolve(__dirname, '@types'),
 	},
 	build: {
 		transpile: ['riot-games-fetch-typed'],
@@ -121,6 +122,7 @@ export default defineNuxtConfig({
 		typeCheck: true,
 		strict: true,
 		tsConfig: {
+			exclude: ['./drizzle'],
 			compilerOptions: {
 				strict: true,
 				strictNullChecks: true,
