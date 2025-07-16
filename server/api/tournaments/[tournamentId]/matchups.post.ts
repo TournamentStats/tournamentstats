@@ -1,14 +1,14 @@
-import * as z from 'zod/v4'
+import * as z from 'zod/v4';
 
-import { Format } from '~~/@types/database.types'
+import { Format } from '~~/@types/database.types';
 
-const teamId = z.string()
+const teamId = z.string();
 
 const _ = z.object({
 	team1_id: teamId,
 	team2_id: teamId,
 	format: z.enum(Format),
-})
+});
 
 /**
  * POST /api/tournaments/[tournamentId]/matchups/
@@ -26,6 +26,6 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling((event) => {
-		return event.toString()
+		return event.toString();
 	}),
-})
+});

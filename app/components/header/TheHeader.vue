@@ -28,15 +28,15 @@
 </template>
 
 <script lang="ts" setup>
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
+const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 
 onMounted(() => {
-	console.log(user.value)
-})
+	console.log(user.value);
+});
 
 async function logout() {
-	await supabase.auth.signOut()
+	await supabase.auth.signOut();
 }
 </script>
 

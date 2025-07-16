@@ -1,14 +1,14 @@
-import * as z from 'zod/v4'
+import * as z from 'zod/v4';
 
-import { getTableColumns } from 'drizzle-orm'
-import { single } from '~~/server/utils/drizzle/utils'
+import { getTableColumns } from 'drizzle-orm';
+import { single } from '~~/server/utils/drizzle/utils';
 
 const requestBody = z.object({
 	name: z.string().min(3).max(32),
 	isPrivate: z.boolean(),
 	imageId: z.string().optional(),
 	region: z.enum(regions),
-})
+});
 
 /**
  * POST /api/tournaments
@@ -22,12 +22,12 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!
+		const user = event.context.auth.user!;
 
-		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => requestBody.parse(data))
+		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => requestBody.parse(data));
 
 		const insertedTournament = await db.transaction(async (tx) => {
-			const { shortId, createdAt, ...rest } = getTableColumns(tournament)
+			const { shortId, createdAt, ...rest } = getTableColumns(tournament);
 
 			const insertedTournament = await tx.insert(tournament)
 				.values({
@@ -37,19 +37,19 @@ export default defineEventHandler({
 					region,
 				})
 				.returning({ ...rest, id: tournament.shortId })
-				.then(single)
+				.then(single);
 
-			let imageUrl = null
+			let imageUrl = null;
 			if (imageId) {
-				imageUrl = (await moveTournamentImage(event, imageId, insertedTournament.id)).signedUrl
+				imageUrl = (await moveTournamentImage(event, imageId, insertedTournament.id)).signedUrl;
 			}
 
 			return {
 				imageUrl,
 				...insertedTournament,
-			}
-		})
+			};
+		});
 
-		return insertedTournament
+		return insertedTournament;
 	}),
-})
+});

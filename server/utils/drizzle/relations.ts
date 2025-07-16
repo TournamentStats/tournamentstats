@@ -1,5 +1,5 @@
-import { relations } from 'drizzle-orm/relations'
-import { game, championBan, team, gameMatchupRelation, matchup, gamePlayerStats, player, gameTeamStats, tournament, usersInAuth, tournamentParticipant, tournamentShareToken } from './schema'
+import { relations } from 'drizzle-orm/relations';
+import { game, championBan, team, gameMatchupRelation, matchup, gamePlayerStats, player, gameTeamStats, tournament, usersInAuth, tournamentParticipant, tournamentShareToken } from './schema';
 
 export const championBanRelations = relations(championBan, ({ one }) => ({
 	game: one(game, {
@@ -10,14 +10,14 @@ export const championBanRelations = relations(championBan, ({ one }) => ({
 		fields: [championBan.teamId],
 		references: [team.teamId],
 	}),
-}))
+}));
 
 export const gameRelations = relations(game, ({ many }) => ({
 	championBans: many(championBan),
 	matchups: many(gameMatchupRelation),
 	playerStats: many(gamePlayerStats),
 	teamStats: many(gameTeamStats),
-}))
+}));
 
 export const teamRelations = relations(team, ({ one, many }) => ({
 	championBans: many(championBan),
@@ -33,7 +33,7 @@ export const teamRelations = relations(team, ({ one, many }) => ({
 		references: [tournament.tournamentId],
 	}),
 	members: many(tournamentParticipant),
-}))
+}));
 
 export const gameMatchupRelationRelations = relations(gameMatchupRelation, ({ one }) => ({
 	game: one(game, {
@@ -44,7 +44,7 @@ export const gameMatchupRelationRelations = relations(gameMatchupRelation, ({ on
 		fields: [gameMatchupRelation.matchupId],
 		references: [matchup.matchupId],
 	}),
-}))
+}));
 
 export const matchupRelations = relations(matchup, ({ one, many }) => ({
 	games: many(gameMatchupRelation),
@@ -62,7 +62,7 @@ export const matchupRelations = relations(matchup, ({ one, many }) => ({
 		references: [team.teamId],
 		relationName: 'matchup_tournamentId_team2_teamId',
 	}),
-}))
+}));
 
 export const gamePlayerStatsRelations = relations(gamePlayerStats, ({ one }) => ({
 	game: one(game, {
@@ -73,12 +73,12 @@ export const gamePlayerStatsRelations = relations(gamePlayerStats, ({ one }) => 
 		fields: [gamePlayerStats.puuid],
 		references: [player.puuid],
 	}),
-}))
+}));
 
 export const playerRelations = relations(player, ({ many }) => ({
 	gameStats: many(gamePlayerStats),
 	tournaments: many(tournamentParticipant),
-}))
+}));
 
 export const gameTeamStatsRelations = relations(gameTeamStats, ({ one }) => ({
 	game: one(game, {
@@ -89,7 +89,7 @@ export const gameTeamStatsRelations = relations(gameTeamStats, ({ one }) => ({
 		fields: [gameTeamStats.teamId],
 		references: [team.teamId],
 	}),
-}))
+}));
 
 export const tournamentRelations = relations(tournament, ({ one, many }) => ({
 	matchups: many(matchup),
@@ -100,11 +100,11 @@ export const tournamentRelations = relations(tournament, ({ one, many }) => ({
 	}),
 	participants: many(tournamentParticipant),
 	shareTokens: many(tournamentShareToken),
-}))
+}));
 
 export const usersInAuthRelations = relations(usersInAuth, ({ many }) => ({
 	tournaments: many(tournament),
-}))
+}));
 
 export const tournamentParticipantRelations = relations(tournamentParticipant, ({ one }) => ({
 	player: one(player, {
@@ -119,11 +119,11 @@ export const tournamentParticipantRelations = relations(tournamentParticipant, (
 		fields: [tournamentParticipant.tournamentId],
 		references: [team.teamId],
 	}),
-}))
+}));
 
 export const tournamentShareTokenRelations = relations(tournamentShareToken, ({ one }) => ({
 	tournament: one(tournament, {
 		fields: [tournamentShareToken.tournamentId],
 		references: [tournament.tournamentId],
 	}),
-}))
+}));

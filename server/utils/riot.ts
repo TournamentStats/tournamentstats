@@ -1,10 +1,10 @@
-import { createRiotFetch } from 'riotapi-fetch-typed'
-import type { LolRegion } from 'riotapi-fetch-typed'
+import { createRiotFetch } from 'riotapi-fetch-typed';
+import type { LolRegion } from 'riotapi-fetch-typed';
 
 export const riotFetch = createRiotFetch({
 	apiKey: useRuntimeConfig().riotGamesApiKey,
 	throwOnResponseError: true,
-})
+});
 
 export function regionToCluster(region: LolRegion) {
 	switch (region) {
@@ -12,11 +12,11 @@ export function regionToCluster(region: LolRegion) {
 		case 'la1':
 		case 'la2':
 		case 'na1':
-			return 'americas'
+			return 'americas';
 		case 'eun1':
 		case 'euw1':
 		case 'tr1':
-			return 'europe'
+			return 'europe';
 		case 'jp1':
 		case 'kr':
 		case 'me1':
@@ -27,7 +27,7 @@ export function regionToCluster(region: LolRegion) {
 		case 'th2':
 		case 'tw2':
 		case 'vn2':
-			return 'asia'
+			return 'asia';
 	}
 }
 

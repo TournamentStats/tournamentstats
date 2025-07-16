@@ -10,13 +10,13 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling((event) => {
-		const tournamentShortId = getRouterParam(event, 'tournamentId')
+		const tournamentShortId = getRouterParam(event, 'tournamentId');
 		if (!tournamentShortId) {
 			throw createError({
 				statusCode: 400,
 				statusMessage: 'Bad Request',
 				message: 'No tournament id given',
-			})
+			});
 		}
-	 })
-})
+	}),
+});

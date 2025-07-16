@@ -18,6 +18,6 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const x = await db.select().from(tournamentParticipant)
+		const x = await db.select().from(tournamentParticipant);
 	}),
-})
+});

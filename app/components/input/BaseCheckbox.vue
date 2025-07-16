@@ -15,10 +15,10 @@
 <script lang="ts" setup>
 defineOptions({
 	inheritAttrs: false,
-})
+});
 const props = defineProps<{
-	id: string
-}>()
+	id: string;
+}>();
 </script>
 
 <style scoped lang="scss">

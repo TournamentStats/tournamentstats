@@ -1,19 +1,19 @@
-import { pgTable, text, index, foreignKey, bigint, integer, smallint, timestamp, boolean, uniqueIndex, varchar, uuid, date, pgEnum, primaryKey } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
+import { pgTable, text, index, foreignKey, bigint, integer, smallint, timestamp, boolean, uniqueIndex, varchar, uuid, date, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
-export const format = pgEnum('format', ['Best of 1', 'Best of 2', 'Best of 3', 'Best of 5', 'Other'])
-export const regions = ['br1', 'eun1', 'euw1', 'jp1', 'kr', 'la1', 'la2', 'me1', 'na1', 'oc1', 'ph2', 'ru', 'sg2', 'th2', 'tr1', 'tw2', 'vn2'] as const
-export const region = pgEnum('region', regions)
-export const side = pgEnum('side', ['BLUE', 'RED'])
+export const format = pgEnum('format', ['Best of 1', 'Best of 2', 'Best of 3', 'Best of 5', 'Other']);
+export const regions = ['br1', 'eun1', 'euw1', 'jp1', 'kr', 'la1', 'la2', 'me1', 'na1', 'oc1', 'ph2', 'ru', 'sg2', 'th2', 'tr1', 'tw2', 'vn2'] as const;
+export const region = pgEnum('region', regions);
+export const side = pgEnum('side', ['BLUE', 'RED']);
 
 export const usersInAuth = pgTable('users', {
 	id: uuid('id').primaryKey(),
-})
+});
 
 export const formatAbbrevation = pgTable('format_abbrevation', {
 	format: format().notNull(),
 	abbrevation: text().notNull(),
-})
+});
 
 export const championBan = pgTable('champion_ban', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -58,7 +58,7 @@ export const championBan = pgTable('champion_ban', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const game = pgTable('game', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -80,7 +80,7 @@ export const game = pgTable('game', {
 		mode: 'string',
 	})
 		.notNull(),
-})
+});
 
 export const gameMatchupRelation = pgTable('game_matchup_relation', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -121,7 +121,7 @@ export const gameMatchupRelation = pgTable('game_matchup_relation', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const gamePlayerStats = pgTable('game_player_stats', {
 	puuid: text().notNull(),
@@ -193,7 +193,7 @@ export const gamePlayerStats = pgTable('game_player_stats', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const gameTeamStats = pgTable('game_team_stats', {
 	side: side().notNull(),
@@ -255,7 +255,7 @@ export const gameTeamStats = pgTable('game_team_stats', {
 	})
 		.onUpdate('cascade')
 		.onDelete('set null'),
-])
+]);
 
 export const matchup = pgTable('matchup', {
 	matchupId: bigint('matchup_id', {
@@ -331,7 +331,7 @@ export const matchup = pgTable('matchup', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const player = pgTable('player', {
 	puuid: text().primaryKey(),
@@ -353,7 +353,7 @@ export const player = pgTable('player', {
 	gameName: text('game_name'),
 	tagLine: text('tag_line'),
 	region: region().notNull(),
-})
+});
 
 export const team = pgTable('team', {
 	teamId: bigint('team_id', {
@@ -394,7 +394,7 @@ export const team = pgTable('team', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const tournament = pgTable('tournament', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -439,7 +439,7 @@ export const tournament = pgTable('tournament', {
 	})
 		.onUpdate('cascade')
 		.onDelete('cascade'),
-])
+]);
 
 export const tournamentParticipant = pgTable('tournament_participant', {
 	puuid: text().notNull(),
@@ -471,7 +471,7 @@ export const tournamentParticipant = pgTable('tournament_participant', {
 		foreignColumns: [team.teamId, team.tournamentId],
 		name: 'tournament_participant_tournament_id_team_id_fkey',
 	}).onUpdate('cascade').onDelete('restrict'),
-])
+]);
 
 export const tournamentShareToken = pgTable('tournament_share_token', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
@@ -484,4 +484,4 @@ export const tournamentShareToken = pgTable('tournament_share_token', {
 		foreignColumns: [tournament.tournamentId],
 		name: 'tournament_share_token_tournament_id_fkey',
 	}).onUpdate('cascade').onDelete('cascade'),
-])
+]);

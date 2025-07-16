@@ -1,3 +1,3 @@
 export default defineEventHandler((event) => {
-	event.context.errors = []
-})
+	event.context.errors = [];
+});

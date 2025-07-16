@@ -1,9 +1,9 @@
-import * as z from 'zod/v4'
+import * as z from 'zod/v4';
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
 	riotId: z.string().regex(/^[\p{L}\p{N}]{3,16}-[\p{L}\p{N}]{3,5}$/u),
-})
+});
 /**
  * GET tournaments/[tournamentId]/participants/[riotId]
  *
@@ -16,7 +16,7 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const { tournamentId, riotId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
-		console.log(tournamentId, riotId)
-	 })
-})
+		const { tournamentId, riotId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		console.log(tournamentId, riotId);
+	}),
+});

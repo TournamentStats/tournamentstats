@@ -14,6 +14,6 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling((event) => {
-		return event.toString()
+		return event.toString();
 	}),
-})
+});

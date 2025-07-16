@@ -43,47 +43,47 @@
 </template>
 
 <script setup lang="ts">
-const PLACEHOLDER_IMAGE = '/images/team_logo_placeholder.png'
+const PLACEHOLDER_IMAGE = '/images/team_logo_placeholder.png';
 
-const input = useTemplateRef('input')
-const transfer = useTemplateRef<HTMLElement>('transfer')
+const input = useTemplateRef('input');
+const transfer = useTemplateRef<HTMLElement>('transfer');
 
-const file = defineModel<File | null>({ required: true })
-const imageUrl = ref<string>(PLACEHOLDER_IMAGE)
+const file = defineModel<File | null>({ required: true });
+const imageUrl = ref<string>(PLACEHOLDER_IMAGE);
 
 defineProps<{
-	id: string
-	maxFileSizeMb: number
-}>()
+	id: string;
+	maxFileSizeMb: number;
+}>();
 
 watch(file, (newFile, oldFile) => {
-	console.log('file changed', 'old:', oldFile, 'new: ', newFile)
+	console.log('file changed', 'old:', oldFile, 'new: ', newFile);
 	if (oldFile) {
-		URL.revokeObjectURL(imageUrl.value)
+		URL.revokeObjectURL(imageUrl.value);
 	}
 	if (newFile) {
-		imageUrl.value = URL.createObjectURL(newFile)
+		imageUrl.value = URL.createObjectURL(newFile);
 	}
 	else {
-		imageUrl.value = PLACEHOLDER_IMAGE
+		imageUrl.value = PLACEHOLDER_IMAGE;
 	}
-})
+});
 
 const customImageSet = computed(
 	() => imageUrl.value !== PLACEHOLDER_IMAGE,
-)
+);
 
 onUnmounted(() => {
 	if (imageUrl.value) {
-		URL.revokeObjectURL(imageUrl.value)
+		URL.revokeObjectURL(imageUrl.value);
 	}
-})
+});
 
 function handleDelete() {
-	file.value = null
+	file.value = null;
 }
 
-const { handleClick, isDragging } = UseFile(file, input, transfer)
+const { handleClick, isDragging } = UseFile(file, input, transfer);
 </script>
 
 <style scoped lang="scss">

@@ -1,7 +1,7 @@
 // @ts-check
-import tseslint from 'typescript-eslint'
-import withNuxt from './.nuxt/eslint.config.mjs'
-import type { Linter } from 'eslint'
+import tseslint from 'typescript-eslint';
+import withNuxt from './.nuxt/eslint.config.mjs';
+import type { Linter } from 'eslint';
 
 const languageOptions: Linter.LanguageOptions = {
 	parserOptions: {
@@ -9,7 +9,7 @@ const languageOptions: Linter.LanguageOptions = {
 		projectService: true,
 		tsconfigRootDir: import.meta.dirname,
 	},
-}
+};
 
 export default withNuxt()
 	.prepend({
@@ -27,4 +27,4 @@ export default withNuxt()
 		},
 		languageOptions,
 	})
-	.override('typescript-eslint/stylistic-type-checked', { languageOptions })
+	.override('typescript-eslint/stylistic-type-checked', { languageOptions });

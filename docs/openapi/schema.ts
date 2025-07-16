@@ -1,4 +1,4 @@
-import type { ComponentsObject } from 'openapi-typescript'
+import type { ComponentsObject } from 'openapi-typescript';
 
 export const components: ComponentsObject = {
 	securitySchemes: {
@@ -9,4 +9,4 @@ export const components: ComponentsObject = {
 			name: 'tstats-auth',
 		},
 	},
-}
+};

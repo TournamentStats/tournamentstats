@@ -1,4 +1,4 @@
-import type { openAPISchema } from '@types'
+import type { openAPISchema } from '@types';
 
 export const docs: openAPISchema = {
 	tags: ['tournament'],
@@ -202,4 +202,4 @@ export const docs: openAPISchema = {
 		},
 	},
 	security: [{ authentication: [] }],
-}
+};

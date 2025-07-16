@@ -43,37 +43,37 @@
 <script lang="ts" setup>
 definePageMeta({
 	layout: 'login',
-})
+});
 
-const redirectQuery = useRoute().query.redirectTo
-const redirect = (Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery) ?? '/'
+const redirectQuery = useRoute().query.redirectTo;
+const redirect = (Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery) ?? '/';
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient();
 
-const email = ref('')
-const emailError = ref(false)
+const email = ref('');
+const emailError = ref(false);
 
-const password = ref('')
-const passwordError = ref(false)
+const password = ref('');
+const passwordError = ref(false);
 
-const passwordErrorText = ref('')
+const passwordErrorText = ref('');
 
 async function handleRegister() {
-	emailError.value = false
-	passwordError.value = false
-	passwordErrorText.value = ''
+	emailError.value = false;
+	passwordError.value = false;
+	passwordErrorText.value = '';
 
 	const { error } = await supabase.auth.signUp({
 		email: email.value,
 		password: password.value,
-	})
+	});
 
 	if (error) {
-		passwordErrorText.value = error.message
-		passwordError.value = true
-		return
+		passwordErrorText.value = error.message;
+		passwordError.value = true;
+		return;
 	}
-	await navigateTo(redirect)
+	await navigateTo(redirect);
 }
 
 async function handleDiscordLogin() {
@@ -82,9 +82,9 @@ async function handleDiscordLogin() {
 		options: {
 			redirectTo: 'https://localhost:3000/callback', // ?redirectTo=' + encodeURIComponent(redirect),
 		},
-	})
+	});
 	if (error) {
-		console.error(error)
+		console.error(error);
 	}
 }
 </script>

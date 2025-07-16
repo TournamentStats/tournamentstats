@@ -1,8 +1,8 @@
-import * as z from 'zod/v4'
+import * as z from 'zod/v4';
 
 const _ = z.object({
 	game_id: z.number(),
-})
+});
 
 /**
  * POST /api/tournaments/[tournamentId]/matchups/[matchupId]/games
@@ -19,6 +19,6 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling((event) => {
-		return event.toString()
+		return event.toString();
 	}),
-})
+});

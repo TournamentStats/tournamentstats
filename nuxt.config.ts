@@ -1,5 +1,5 @@
-import { resolve } from 'path'
-import devtoolslsJson from 'vite-plugin-devtools-json'
+import { resolve } from 'path';
+import devtoolslsJson from 'vite-plugin-devtools-json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -138,6 +138,7 @@ export default defineNuxtConfig({
 		config: {
 			stylistic: {
 				indent: 'tab',
+				semi: true,
 			},
 		},
 	},
@@ -152,4 +153,4 @@ export default defineNuxtConfig({
 		},
 		cookiePrefix: 'tstats-auth',
 	},
-})
+});

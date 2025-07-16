@@ -27,20 +27,20 @@
 </template>
 
 <script setup lang="ts">
-import { UseFile } from '~/composables/useFile'
+import { UseFile } from '~/composables/useFile';
 
-const input = useTemplateRef('input')
-const transfer = useTemplateRef<HTMLElement>('transfer')
+const input = useTemplateRef('input');
+const transfer = useTemplateRef<HTMLElement>('transfer');
 
-const file = defineModel<File | null>({ required: true })
+const file = defineModel<File | null>({ required: true });
 
 defineProps<{
-	id: string
-	accept: string
-	maxFileSizeMb: number
-}>()
+	id: string;
+	accept: string;
+	maxFileSizeMb: number;
+}>();
 
-const { handleClick, isDragging } = UseFile(file, input, transfer)
+const { handleClick, isDragging } = UseFile(file, input, transfer);
 </script>
 
 <style scoped lang="scss">

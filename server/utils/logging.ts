@@ -1,20 +1,20 @@
-import { createLogger, format, transports } from 'winston'
-import type { H3Event, EventHandlerResponse } from 'h3'
-import type { TransformableInfo } from 'logform'
+import { createLogger, format, transports } from 'winston';
+import type { H3Event, EventHandlerResponse } from 'h3';
+import type { TransformableInfo } from 'logform';
 
 declare module 'h3' {
 	interface H3EventContext {
-		errors: Error[]
+		errors: Error[];
 	}
 }
 
 interface Meta {
-	payload?: object
-	section?: string
+	payload?: object;
+	section?: string;
 }
 
 // Helper function to format payloads as JSON
-const formatPayload = (payload: object): string => JSON.stringify(payload, null, 4)
+const formatPayload = (payload: object): string => JSON.stringify(payload, null, 4);
 
 const logger = createLogger({
 	level: 'info',
@@ -28,8 +28,8 @@ const logger = createLogger({
 			filename: 'logs/latest.log',
 			format: format.combine(
 				format.printf(({ timestamp, level, message, ...meta }: TransformableInfo & Meta) => {
-					const formattedPayload = meta.payload ? formatPayload(meta.payload) : ''
-					return `${timestamp as string} [${level.toUpperCase()}] ${meta.section ? `${meta.section} - ` : ''}${message?.toString() ?? ''}\n${formattedPayload}`
+					const formattedPayload = meta.payload ? formatPayload(meta.payload) : '';
+					return `${timestamp as string} [${level.toUpperCase()}] ${meta.section ? `${meta.section} - ` : ''}${message?.toString() ?? ''}\n${formattedPayload}`;
 				}),
 			),
 		}),
@@ -39,30 +39,30 @@ const logger = createLogger({
 			format: format.combine(
 				format.json(),
 				format.printf(({ timestamp, level, message, ...meta }) => {
-					const payload = meta.payload && null
-					const section = meta.section && null
+					const payload = meta.payload && null;
+					const section = meta.section && null;
 					return JSON.stringify({
 						timestamp,
 						level,
 						message,
 						payload,
 						section,
-					})
+					});
 				}),
 			),
 		}),
 	],
-})
+});
 
-logger.info('Logging started')
+logger.info('Logging started');
 
-export { logger }
+export { logger };
 
 // utility functions for logging
 
 // Log the result of an API, including route, user/ip and errors, if occured
 export function logAPI(event: H3Event, response?: {
-	body?: Awaited<EventHandlerResponse>
+	body?: Awaited<EventHandlerResponse>;
 }): void {
 	if (event.context.errors.length > 0) {
 		logger.error(event.toString(), {
@@ -73,7 +73,7 @@ export function logAPI(event: H3Event, response?: {
 				user: event.context.auth.user,
 				ip_adress: getRequestIP(event, { xForwardedFor: true }),
 			},
-		})
+		});
 	}
 	else {
 		logger.info(event.toString(), {
@@ -83,6 +83,6 @@ export function logAPI(event: H3Event, response?: {
 				user: event.context.auth.user,
 				ip_adress: getRequestIP(event, { xForwardedFor: true }),
 			},
-		})
+		});
 	}
 }

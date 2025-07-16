@@ -1,10 +1,10 @@
-import { and, eq, getTableColumns } from 'drizzle-orm'
-import * as z from 'zod/v4'
+import { and, eq, getTableColumns } from 'drizzle-orm';
+import * as z from 'zod/v4';
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
 	teamId: z.string().min(1),
-})
+});
 
 /**
  * GET /api/tournaments/[tournamentId]/teams/[teamId]
@@ -18,10 +18,10 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user
+		const user = event.context.auth.user;
 
-		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
-		const { shortId, createdAt, ...rest } = getTableColumns(team)
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		const { shortId, createdAt, ...rest } = getTableColumns(team);
 		const selectedTeam = await db.select({
 			...rest,
 			teamId: team.shortId,
@@ -36,17 +36,17 @@ export default defineEventHandler({
 					hasTournamentViewPermissions(user),
 				),
 			)
-			.then(maybeSingle)
+			.then(maybeSingle);
 
 		if (!selectedTeam) {
-			throw createNotFoundError('Team')
+			throw createNotFoundError('Team');
 		}
 
-		const imageUrl = await getSignedTeamImage(event, selectedTeam.tournamentId, selectedTeam.teamId)
+		const imageUrl = await getSignedTeamImage(event, selectedTeam.tournamentId, selectedTeam.teamId);
 
 		return {
 			imageUrl,
 			...selectedTeam,
-		}
+		};
 	}),
-})
+});

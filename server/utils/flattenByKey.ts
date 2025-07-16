@@ -9,6 +9,6 @@ export function flattenByKey<T extends object, K extends keyof T>(
 	obj: T,
 	key: K,
 ): Omit<T, K> & T[K] {
-	const { [key]: nested, ...rest } = obj
-	return { ...rest, ...nested }
+	const { [key]: nested, ...rest } = obj;
+	return { ...rest, ...nested };
 }

@@ -18,8 +18,8 @@
 
 <script lang="ts" setup>
 const { to } = defineProps<{
-	to?: string
-}>()
+	to?: string;
+}>();
 </script>
 
 <style scoped lang="scss">

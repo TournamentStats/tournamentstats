@@ -1,9 +1,9 @@
-import { and, eq, getTableColumns } from 'drizzle-orm'
-import * as z from 'zod/v4'
+import { and, eq, getTableColumns } from 'drizzle-orm';
+import * as z from 'zod/v4';
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
-})
+});
 
 /**
  * GET tournaments/[tournamentId]/teams
@@ -17,9 +17,9 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user
-		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
-		const { shortId, createdAt, ...rest } = getTableColumns(team)
+		const user = event.context.auth.user;
+		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		const { shortId, createdAt, ...rest } = getTableColumns(team);
 		const selectedTeams = await db.select({
 			...rest,
 			teamId: team.shortId,
@@ -32,8 +32,8 @@ export default defineEventHandler({
 					eq(tournament.shortId, tournamentId),
 					hasTournamentViewPermissions(user),
 				),
-			)
+			);
 
-		return selectedTeams
+		return selectedTeams;
 	}),
-})
+});

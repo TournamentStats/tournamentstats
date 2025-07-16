@@ -1,1 +1,1 @@
-export type openAPISchema = ReturnType<typeof defineRouteMeta>['openAPI']
+export type openAPISchema = ReturnType<typeof defineRouteMeta>['openAPI'];

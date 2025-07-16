@@ -10,15 +10,15 @@
 </template>
 
 <script setup lang="ts">
-console.log('confirm')
-const user = useSupabaseUser()
+console.log('confirm');
+const user = useSupabaseUser();
 
-const redirectQuery = useRoute().query.redirectTo
-const redirect = Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery
+const redirectQuery = useRoute().query.redirectTo;
+const redirect = Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery;
 
 watch(user, async () => {
 	if (user.value) {
-		await navigateTo(redirect)
+		await navigateTo(redirect);
 	}
-}, { immediate: true })
+}, { immediate: true });
 </script>

@@ -7,9 +7,9 @@
 
 <script lang="ts" setup>
 definePageMeta({
-})
+});
 
-const userId = useRoute().params.userId
+const userId = useRoute().params.userId;
 </script>
 
 <style></style>

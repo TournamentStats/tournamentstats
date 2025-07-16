@@ -1,10 +1,10 @@
-import { H3Error } from 'h3'
-import type { User } from '@supabase/supabase-js'
-import { serverSupabaseUser } from '#supabase/server'
+import { H3Error } from 'h3';
+import type { User } from '@supabase/supabase-js';
+import { serverSupabaseUser } from '#supabase/server';
 
 declare module 'h3' {
 	interface H3EventContext {
-		auth: { user: User | null }
+		auth: { user: User | null };
 	}
 }
 
@@ -15,17 +15,17 @@ declare module 'h3' {
 export default defineEventHandler(
 	async (event) => {
 		try {
-			const user = await serverSupabaseUser(event)
-			event.context.auth = { user: user }
+			const user = await serverSupabaseUser(event);
+			event.context.auth = { user: user };
 		}
 		catch (e) {
 		// Session not found
 			if (e instanceof H3Error) {
-				event.context.auth = { user: null }
+				event.context.auth = { user: null };
 			}
 			else {
-				throw e
+				throw e;
 			}
 		}
 	},
-)
+);

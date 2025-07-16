@@ -1,11 +1,11 @@
-import { eq, and } from 'drizzle-orm'
-import * as z from 'zod/v4'
+import { eq, and } from 'drizzle-orm';
+import * as z from 'zod/v4';
 
-import { hasTournamentDeletePermissions } from '~~/server/utils/drizzle/utils'
+import { hasTournamentDeletePermissions } from '~~/server/utils/drizzle/utils';
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
-})
+});
 
 /**
  * DELETE /tournments/[tournamentId]
@@ -17,8 +17,8 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!
-		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
+		const user = event.context.auth.user!;
+		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
 		const deletedTournament = await db.delete(tournament)
 			.where(
 				and(
@@ -27,16 +27,16 @@ export default defineEventHandler({
 				),
 			)
 			.returning({ shortId: tournament.shortId })
-			.then(maybeSingle)
+			.then(maybeSingle);
 
 		if (!deletedTournament) {
-			throw createNotFoundError('Tournament')
+			throw createNotFoundError('Tournament');
 		}
 
 		// theoretical we can return here and execute the deletion in the background
-		sendNoContent(event)
+		sendNoContent(event);
 
 		// fire and forget image deletion
-		void deleteTournamentImages(event, deletedTournament.shortId)
+		void deleteTournamentImages(event, deletedTournament.shortId);
 	}),
-})
+});

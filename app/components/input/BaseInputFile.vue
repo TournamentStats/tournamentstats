@@ -18,18 +18,18 @@
 </template>
 
 <script setup lang="ts">
-const input = ref<HTMLInputElement>()
+const input = ref<HTMLInputElement>();
 
-const file = defineModel<File | null>({ required: true })
+const file = defineModel<File | null>({ required: true });
 
 defineProps<{
-	id: string
-	accept: string
-	maxFileSizeMb: number
-}>()
+	id: string;
+	accept: string;
+	maxFileSizeMb: number;
+}>();
 
 function onFileChange(e: Event) {
-	file.value = (e.target as HTMLInputElement).files?.[0] ?? null
+	file.value = (e.target as HTMLInputElement).files?.[0] ?? null;
 }
 </script>
 

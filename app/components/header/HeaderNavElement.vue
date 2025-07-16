@@ -16,8 +16,8 @@
 
 <script lang="ts" setup>
 defineProps<{
-	to?: string | null
-}>()
+	to?: string | null;
+}>();
 </script>
 
 <style scoped lang="scss">

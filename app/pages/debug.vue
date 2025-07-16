@@ -79,11 +79,11 @@
 </template>
 
 <script lang="ts" setup>
-const text1 = ref('Hello World')
-const error = ref(true)
+const text1 = ref('Hello World');
+const error = ref(true);
 
-const file = ref <File | null> (null)
-const file2 = ref <File | null> (null)
+const file = ref <File | null> (null);
+const file2 = ref <File | null> (null);
 </script>
 
 <style>

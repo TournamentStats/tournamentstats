@@ -46,37 +46,37 @@
 <script setup lang="ts">
 defineOptions({
 	inheritAttrs: false,
-})
+});
 
-const attrs = useAttrs()
-const { 'class': attrsClass, ...attrsWithoutClass } = attrs
+const attrs = useAttrs();
+const { 'class': attrsClass, ...attrsWithoutClass } = attrs;
 
-const showPassword = ref(false)
+const showPassword = ref(false);
 
 function toggleVisibility() {
-	showPassword.value = !showPassword.value
+	showPassword.value = !showPassword.value;
 }
 
-const value = defineModel<string>({ required: true })
-const error = defineModel<boolean>('error', { default: false })
+const value = defineModel<string>({ required: true });
+const error = defineModel<boolean>('error', { default: false });
 
 withDefaults(
 	defineProps<{
-		id: string
-		type?: 'text' | 'email' | 'password' | 'tel' | 'url'
-		required?: boolean
-		supportingText?: string | null
+		id: string;
+		type?: 'text' | 'email' | 'password' | 'tel' | 'url';
+		required?: boolean;
+		supportingText?: string | null;
 	}>(),
 	{
 		type: 'text',
 		required: false,
 		supportingText: '',
 	},
-)
+);
 
 defineEmits<{
-	'update:modelValue': [value: string]
-}>()
+	'update:modelValue': [value: string];
+}>();
 </script>
 
 <style scoped lang="scss">

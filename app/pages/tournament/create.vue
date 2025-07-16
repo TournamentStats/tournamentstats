@@ -37,16 +37,16 @@
 <script lang="ts" setup>
 definePageMeta({
 	middleware: 'authentication',
-})
+});
 
-const tournamentName = ref('')
-const tournamentImage = ref <File | null> (null)
-const isPrivate = ref(false)
+const tournamentName = ref('');
+const tournamentImage = ref <File | null> (null);
+const isPrivate = ref(false);
 
-let imageId: string | undefined
+let imageId: string | undefined;
 
 async function createTournament() {
-	console.log(tournamentName, tournamentImage)
+	console.log(tournamentName, tournamentImage);
 	await $fetch('/api/tournaments', {
 		method: 'POST',
 		headers: useRequestHeaders(['cookie']),
@@ -55,7 +55,7 @@ async function createTournament() {
 			isPrivate: isPrivate.value,
 			imageId: imageId,
 		},
-	})
+	});
 }
 
 watch(tournamentImage, async (new_image, _) => {
@@ -67,14 +67,14 @@ watch(tournamentImage, async (new_image, _) => {
 				'Content-Type': 'image/png',
 			},
 			body: tournamentImage.value,
-		})
-		imageId = response.imageId
-		console.log(imageId)
+		});
+		imageId = response.imageId;
+		console.log(imageId);
 	}
 	else {
-		imageId = undefined
+		imageId = undefined;
 	}
-})
+});
 </script>
 
 <style scoped lang="scss">

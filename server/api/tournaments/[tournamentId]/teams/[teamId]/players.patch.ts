@@ -1,22 +1,22 @@
-import * as z from 'zod/v4'
+import * as z from 'zod/v4';
 
-import { and, eq, sql, notExists, inArray } from 'drizzle-orm'
+import { and, eq, sql, notExists, inArray } from 'drizzle-orm';
 
-import { docs } from '@server/docs/tournaments/[tournamentId]/teams/[teamId]/players.patch.docs'
-import { RiotError } from 'riotapi-fetch-typed'
-import type { LolRegion } from 'riotapi-fetch-typed'
+import { docs } from '@server/docs/tournaments/[tournamentId]/teams/[teamId]/players.patch.docs';
+import { RiotError } from 'riotapi-fetch-typed';
+import type { LolRegion } from 'riotapi-fetch-typed';
 
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
 	teamId: z.string().min(1),
-})
+});
 
-const Puuid = z.string().length(78, 'No valid puuid')
+const Puuid = z.string().length(78, 'No valid puuid');
 
 const Player = z.object({
 	puuid: Puuid,
 	name: z.string().min(2).max(24).optional(),
-})
+});
 
 const RequestBody = z.object({
 	add: z.array(Player).optional(),
@@ -24,21 +24,24 @@ const RequestBody = z.object({
 }).refine(data => data.add?.length ?? data.remove?.length, {
 	message: 'At least one of \'add\' or \'remove\' must be provided and non-empty',
 	path: ['add', 'remove'],
-})
+});
 
 defineRouteMeta({
 	openAPI: docs,
-})
+});
 
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = await requireAuthorization(event)
-		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj))
-		const { add, remove } = await readValidatedBody(event, data => RequestBody.parse(data))
+		const user = await requireAuthorization(event);
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
+		const { add, remove } = await readValidatedBody(event, data => RequestBody.parse(data));
 
+		// check permissions, get information about tournament
+		// region needed for fetching players
+		// ids needed for deleting
 		const context = await db.select({
 			tournamentId: tournament.tournamentId,
 			teamId: team.teamId,
@@ -52,15 +55,15 @@ export default defineEventHandler({
 					hasTournamentModifyPermissions(user),
 				),
 			)
-			.then(maybeSingle)
+			.then(maybeSingle);
 
 		if (!context) {
-			throw createNotFoundError('Team')
+			throw createNotFoundError('Team');
 		}
 
-		const puuids = [...(add?.map(p => p.puuid) ?? []), ...(remove ?? [])]
+		const puuids = [...(add?.map(p => p.puuid) ?? []), ...(remove ?? [])];
 
-		// check if there a puuids not in our system
+		// check if there a puuids not in our database
 		const missingPuuids = await db.select({
 			puuid: sql<string>`puuid`.as('puuid'),
 		})
@@ -75,33 +78,17 @@ export default defineEventHandler({
 							eq(player.puuid, sql`needed_puuids.puuid`),
 						),
 				),
-			)
+			);
 
+		// await all player fetches.
 		await Promise.all(
 			missingPuuids.map(
 				missingPlayer => fetchPlayer(missingPlayer.puuid, context.region),
 			),
-		)
+		);
 
 		const { added, removed } = await db.transaction(async (tx) => {
-			const fks = await tx.select({
-				tournamentId: tournament.tournamentId,
-				teamId: team.teamId,
-			})
-				.from(team)
-				.innerJoin(tournament, eq(team.tournamentId, tournament.tournamentId))
-				.where(
-					and(
-						eq(tournament.shortId, tournamentId),
-						eq(team.shortId, teamId),
-					),
-				)
-				.then(maybeSingle)
-
-			if (!fks) {
-				throw createNotFoundError('Team', 'in the specified tournament.')
-			}
-			let added
+			let added;
 			if (add && add.length > 0) {
 				const insertedPlayerCTE = tx.$with('inserted_player').as(
 					tx.insert(tournamentParticipant)
@@ -112,7 +99,7 @@ export default defineEventHandler({
 							name: sql.placeholder('name'),
 						})
 						.returning(),
-				)
+				);
 
 				const prepared = db.with(insertedPlayerCTE)
 					.select({
@@ -124,19 +111,19 @@ export default defineEventHandler({
 					.from(insertedPlayerCTE)
 					.innerJoin(tournament, eq(insertedPlayerCTE.tournamentId, tournament.tournamentId))
 					.innerJoin(team, eq(insertedPlayerCTE.teamId, team.teamId))
-					.prepare('insert_player')
+					.prepare('insert_player');
 
 				added = await Promise.all(add.map(async (player) => {
 					const insertedPlayer = await prepared.execute({
 						...player,
-						tournamentId: fks.tournamentId,
-						teamId: fks.teamId,
+						tournamentId: context.tournamentId,
+						teamId: context.teamId,
 					})
-						.then(single)
-					return insertedPlayer
-				}))
+						.then(single);
+					return insertedPlayer;
+				}));
 			}
-			let removed
+			let removed;
 			if (remove && remove.length > 0) {
 				const removedParticipants = await db.delete(tournamentParticipant)
 					.where(
@@ -146,44 +133,44 @@ export default defineEventHandler({
 							inArray(tournamentParticipant.puuid, remove),
 						),
 					)
-					.returning()
-				removed = removedParticipants.map(p => p.puuid)
+					.returning();
+				removed = removedParticipants.map(p => p.puuid);
 			}
-			return { added, removed }
-		})
-		return { added, removed }
+			return { added, removed };
+		});
+		return { added, removed };
 	}),
-})
+});
 
 async function fetchPlayer(puuid: string, region: LolRegion) {
-	let account
+	let account;
 	try {
 		account = (await riotFetch(`/riot/account/v1/accounts/by-puuid/${puuid}`, {
 			region: regionToCluster(region),
-		})).data
+		})).data;
 	}
 	catch (e: unknown) {
 		if (e instanceof RiotError) {
 			if (e.statusCode === 404) {
-				throw createNotFoundError('PUUID')
+				throw createNotFoundError('PUUID');
 			}
 		}
-		throw e
+		throw e;
 	}
 
-	let summoner
+	let summoner;
 	try {
 		summoner = (await riotFetch(`/lol/summoner/v4/summoners/by-puuid/${puuid}`, {
 			region,
-		})).data
+		})).data;
 	}
 	catch (e: unknown) {
 		if (e instanceof RiotError) {
 			if (e.statusCode === 404) {
-				throw createNotFoundError('Summoner')
+				throw createNotFoundError('Summoner');
 			}
 		}
-		throw e
+		throw e;
 	}
 
 	await db.insert(player)
@@ -203,5 +190,5 @@ async function fetchPlayer(puuid: string, region: LolRegion) {
 				region: region,
 				profileIconId: summoner.profileIconId,
 			},
-		})
+		});
 }

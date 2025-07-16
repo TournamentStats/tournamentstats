@@ -163,9 +163,9 @@ defineRouteMeta({
 			},
 		},
 	},
-})
+});
 
 export default defineEventHandler((event) => {
-	setResponseStatus(event, 404, 'Not Found')
+	setResponseStatus(event, 404, 'Not Found');
 	// return event
-})
+});

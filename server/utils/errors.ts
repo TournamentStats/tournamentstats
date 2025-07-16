@@ -1,13 +1,13 @@
-import { H3Error } from 'h3'
-import type { H3Event } from 'h3'
-import { ZodError, z } from 'zod/v4'
+import { H3Error } from 'h3';
+import type { H3Event } from 'h3';
+import { ZodError, z } from 'zod/v4';
 
-export function createGenericError({ statusCode, statusMessage, message }: { statusCode?: number, statusMessage?: string, message?: string } = {}) {
+export function createGenericError({ statusCode, statusMessage, message }: { statusCode?: number; statusMessage?: string; message?: string } = {}) {
 	return createError({
 		statusCode: statusCode ?? 500,
 		statusMessage: statusMessage ?? 'Internal Server error',
 		message: message ?? 'Something unexpected happened',
-	})
+	});
 }
 
 export function createNotFoundError(resource: string, extra?: string) {
@@ -15,16 +15,16 @@ export function createNotFoundError(resource: string, extra?: string) {
 		statusCode: 404,
 		statusMessage: 'Not Found',
 		message: `${resource} not found${extra != undefined ? ` ${extra}` : ''}`,
-	})
+	});
 }
 
 interface ErrorData {
-	statusCode: number
-	statusMessage?: string
+	statusCode: number;
+	statusMessage?: string;
 	error?: {
-		message: string
-		data?: unknown
-	}
+		message: string;
+		data?: unknown;
+	};
 }
 
 /**
@@ -49,7 +49,7 @@ export function withErrorHandling<ReturnData>(
 ): (event: H3Event) => Promise<ReturnData | ErrorData> | ReturnData | ErrorData {
 	return async function (event: H3Event) {
 		try {
-			return await handler(event)
+			return await handler(event);
 		}
 		catch (e: unknown) {
 			if (e instanceof Error) {
@@ -57,15 +57,15 @@ export function withErrorHandling<ReturnData>(
 				const errorData: ErrorData = {
 					statusCode: 500,
 					statusMessage: 'Internal Server error',
-				}
+				};
 
 				// get information from H3Error
 				if (e instanceof H3Error) {
-					errorData.statusCode = e.statusCode
-					errorData.statusMessage = e.statusMessage
+					errorData.statusCode = e.statusCode;
+					errorData.statusMessage = e.statusMessage;
 					errorData.error = {
 						message: e.message,
-					}
+					};
 				}
 
 				// fill error details manually
@@ -75,19 +75,19 @@ export function withErrorHandling<ReturnData>(
 					errorData.error = {
 						message: 'Validation Error',
 						data: z.flattenError(e.data).fieldErrors,
-					}
+					};
 				}
 
 				// log unexpected errors
 				if (errorData.statusCode >= 500 && errorData.statusCode < 600) {
-					event.context.errors.push(e)
+					event.context.errors.push(e);
 				}
 
-				setResponseHeader(event, 'Content-Type', 'application/json')
-				setResponseStatus(event, errorData.statusCode, errorData.statusMessage)
-				return errorData
+				setResponseHeader(event, 'Content-Type', 'application/json');
+				setResponseStatus(event, errorData.statusCode, errorData.statusMessage);
+				return errorData;
 			}
-			throw e
+			throw e;
 		}
-	}
+	};
 }

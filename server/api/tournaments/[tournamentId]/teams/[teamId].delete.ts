@@ -1,10 +1,10 @@
-import { and, eq } from 'drizzle-orm'
-import * as z from 'zod/v4'
+import { and, eq } from 'drizzle-orm';
+import * as z from 'zod/v4';
 
 const pathParams = z.object({
 	tournamentId: z.string().min(1),
 	teamId: z.string().min(1),
-})
+});
 
 /**
  * DELETE /api/tournaments/[tournamentId]/teams/[teamId]
@@ -16,9 +16,9 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!
+		const user = event.context.auth.user!;
 
-		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj))
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
 
 		await db.delete(team)
 			.where(
@@ -27,11 +27,11 @@ export default defineEventHandler({
 					eq(team.shortId, teamId),
 					hasTournamentModifyPermissions(user),
 				),
-			)
+			);
 
-		sendNoContent(event)
+		sendNoContent(event);
 
 		// delete team image
-		void deleteTeamImage(event, tournamentId, teamId)
+		void deleteTeamImage(event, tournamentId, teamId);
 	}),
-})
+});
