@@ -3,7 +3,7 @@ import devtoolslsJson from 'vite-plugin-devtools-json';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	modules: ['@nuxtjs/supabase', '@nuxt/eslint', 'nuxt-openapi-docs-module'],
+	modules: ['@nuxtjs/supabase', '@nuxt/eslint'],
 	components: [
 		{
 			path: '~/components',
@@ -87,7 +87,6 @@ export default defineNuxtConfig({
 		imports: {
 			dirs: [
 				'server/utils',
-				'server/utils/auth',
 			],
 		},
 		experimental: {
@@ -116,13 +115,17 @@ export default defineNuxtConfig({
 		plugins: [
 			devtoolslsJson(),
 		],
+		build: {
+			sourcemap: true,
+		},
 	},
 
 	typescript: {
 		typeCheck: true,
 		strict: true,
 		tsConfig: {
-			exclude: ['./drizzle'],
+			include: ['../drizzle.config.ts', '../eslint.config.mts'],
+			exclude: ['../drizzle'],
 			compilerOptions: {
 				strict: true,
 				strictNullChecks: true,
@@ -130,8 +133,13 @@ export default defineNuxtConfig({
 				noImplicitThis: true,
 				alwaysStrict: true,
 				noUncheckedIndexedAccess: true,
+				noErrorTruncation: true,
 			},
 		},
+	},
+
+	telemetry: {
+		enabled: false,
 	},
 
 	eslint: {

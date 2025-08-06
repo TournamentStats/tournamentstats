@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import * as z from 'zod/v4';
 
-const pathParams = z.object({
+const PathParams = z.object({
 	tournamentId: z.string().min(1),
 	teamId: z.string().min(1),
 });
@@ -16,9 +16,9 @@ export default defineEventHandler({
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!;
+		const user = await requireAuthorization(event);
 
-		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 
 		await db.delete(team)
 			.where(

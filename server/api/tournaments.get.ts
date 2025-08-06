@@ -10,13 +10,6 @@ defineRouteMeta({
 	},
 });
 
-/**
- * GET /api/tournaments
- *
- * Gets all tournaments the authenticated user can see
- *
- * ResponseBody: tournament[]
- */
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,

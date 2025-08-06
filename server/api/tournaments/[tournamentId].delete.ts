@@ -3,22 +3,17 @@ import * as z from 'zod/v4';
 
 import { hasTournamentDeletePermissions } from '~~/server/utils/drizzle/utils';
 
-const pathParams = z.object({
+const PathParams = z.object({
 	tournamentId: z.string().min(1),
 });
 
-/**
- * DELETE /tournments/[tournamentId]
- *
- * Deletes a tournament
- */
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!;
-		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		const user = await requireAuthorization(event);
+		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 		const deletedTournament = await db.delete(tournament)
 			.where(
 				and(

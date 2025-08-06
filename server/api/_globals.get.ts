@@ -153,7 +153,7 @@ defineRouteMeta({
 								type: 'string',
 								description: 'The in-game name of the player\'s account',
 							},
-							gameTag: {
+							tagLine: {
 								type: 'string',
 								description: 'The in-game tag of the player\'s account',
 							},

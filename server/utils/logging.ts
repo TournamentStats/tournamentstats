@@ -1,6 +1,8 @@
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports, type LogEntry } from 'winston';
+import TransportStream from 'winston-transport';
 import type { H3Event, EventHandlerResponse } from 'h3';
 import type { TransformableInfo } from 'logform';
+import consola from 'consola';
 
 declare module 'h3' {
 	interface H3EventContext {
@@ -9,12 +11,52 @@ declare module 'h3' {
 }
 
 interface Meta {
-	payload?: object;
+	payload?: Record<string, unknown> & { user?: string; ipAddress?: string; errors?: Error[] };
 	section?: string;
+}
+
+class ConsolaTransport extends TransportStream {
+	override log(info: LogEntry & { payload: { errors: Error[] } }, callback?: () => void) {
+		setImmediate(() => this.emit('logged', info));
+
+		const { level, message, ...meta } = info;
+
+		switch (level) {
+			case 'error':
+				consola.error({ message, ...meta });
+				for (const error of meta.payload.errors) {
+					consola.error(error);
+				}
+				break;
+			case 'warn':
+				consola.warn(message);
+				break;
+			case 'info':
+				consola.info(message);
+				break;
+			case 'debug':
+				consola.debug(message);
+				break;
+			default:
+				consola.log(message);
+		}
+
+		if (callback) callback();
+	}
 }
 
 // Helper function to format payloads as JSON
 const formatPayload = (payload: object): string => JSON.stringify(payload, null, 4);
+
+function indentStack(stack: string | undefined, indent = 4): string {
+	if (!stack) return '';
+	const pad = ' '.repeat(indent);
+	return stack.split('\n').map((line, i) => {
+		if (i == 0)
+			return line.trim();
+		return pad + line.trim();
+	}).join('\n');
+}
 
 const logger = createLogger({
 	level: 'info',
@@ -23,13 +65,30 @@ const logger = createLogger({
 		format.errors({ stack: true }),
 	),
 	transports: [
-		// Human-readable log transport
+		new ConsolaTransport(),
 		new transports.File({
 			filename: 'logs/latest.log',
 			format: format.combine(
-				format.printf(({ timestamp, level, message, ...meta }: TransformableInfo & Meta) => {
-					const formattedPayload = meta.payload ? formatPayload(meta.payload) : '';
-					return `${timestamp as string} [${level.toUpperCase()}] ${meta.section ? `${meta.section} - ` : ''}${message?.toString() ?? ''}\n${formattedPayload}`;
+				format.printf(({ timestamp, level, message, section, payload }: TransformableInfo & Meta) => {
+					let log = `${timestamp as string} [${level.toUpperCase()}] ${section ? `${section} - ` : ''}${message as string}`;
+
+					if (payload) {
+						if (payload.errors?.length) {
+							log += '\nErrors:';
+							payload.errors.forEach((err: Error, i: number) => {
+								log += `\n  [${(i + 1).toString()}] ${indentStack(err.stack, 4)}`;
+							});
+						}
+
+						if (payload.response) {
+							log += `\nResponse:\n${formatPayload(payload.response)}`;
+						}
+
+						log += `\nUser: ${payload.user ?? 'N/A'}`;
+						log += `\nIP Address: ${payload.ipAddress ?? 'N/A'}`;
+					}
+
+					return log;
 				}),
 			),
 		}),
@@ -71,7 +130,7 @@ export function logAPI(event: H3Event, response?: {
 				response,
 				errors: event.context.errors,
 				user: event.context.auth.user,
-				ip_adress: getRequestIP(event, { xForwardedFor: true }),
+				ipAddress: getRequestIP(event, { xForwardedFor: true }),
 			},
 		});
 	}
@@ -81,7 +140,7 @@ export function logAPI(event: H3Event, response?: {
 			payload: {
 				response,
 				user: event.context.auth.user,
-				ip_adress: getRequestIP(event, { xForwardedFor: true }),
+				ipAddress: getRequestIP(event, { xForwardedFor: true }),
 			},
 		});
 	}

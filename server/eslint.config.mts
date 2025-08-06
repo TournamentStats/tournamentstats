@@ -1,5 +1,5 @@
 import tseslint from 'typescript-eslint';
-import withNuxt from './.nuxt/eslint.config.mjs';
+import withNuxt from '../.nuxt/eslint.config.mjs';
 import type { Linter } from 'eslint';
 
 const languageOptions: Linter.LanguageOptions = {

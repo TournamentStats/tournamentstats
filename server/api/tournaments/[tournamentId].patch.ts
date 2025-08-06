@@ -1,13 +1,11 @@
 import { and, eq, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod/v4';
 
-import { hasTournamentModifyPermissions, maybeSingle } from '~~/server/utils/drizzle/utils';
-
-const pathParams = z.object({
+const PathParams = z.object({
 	tournamentId: z.string().min(1),
 });
 
-const requestBody = z.object({
+const RequestBody = z.object({
 	name: z.string().min(3).max(32).optional(),
 	isPrivate: z.boolean().optional(),
 	startDate: z.date().optional(),
@@ -15,21 +13,14 @@ const requestBody = z.object({
 	imageId: z.string().optional(),
 });
 
-/**
- * PATCH /tournaments/[tournamentId]
- *
- * Patches a tournament
- *
- * ResponseBody: tournament
- */
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!;
-		const { tournamentId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
-		const { name, isPrivate, startDate, endDate, imageId } = await readValidatedBody(event, obj => requestBody.parse(obj));
+		const user = await requireAuthorization(event);
+		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
+		const { name, isPrivate, startDate, endDate, imageId } = await readValidatedBody(event, obj => RequestBody.parse(obj));
 
 		const { shortId, createdAt, ...rest } = getTableColumns(tournament);
 		const updatedTournament = await db.transaction(async (tx) => {
@@ -62,8 +53,8 @@ export default defineEventHandler({
 			}
 
 			return {
-				imageUrl,
 				...updatedTournament,
+				imageUrl,
 			};
 		});
 		return updatedTournament;

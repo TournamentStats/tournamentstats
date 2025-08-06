@@ -1,18 +1,25 @@
 import { pgTable, text, index, foreignKey, bigint, integer, smallint, timestamp, boolean, uniqueIndex, varchar, uuid, date, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
-export const format = pgEnum('format', ['Best of 1', 'Best of 2', 'Best of 3', 'Best of 5', 'Other']);
+export const formats = ['Best of 1', 'Best of 2', 'Best of 3', 'Best of 5', 'Other'] as const;
+export const format = pgEnum('format', formats);
+
 export const regions = ['br1', 'eun1', 'euw1', 'jp1', 'kr', 'la1', 'la2', 'me1', 'na1', 'oc1', 'ph2', 'ru', 'sg2', 'th2', 'tr1', 'tw2', 'vn2'] as const;
 export const region = pgEnum('region', regions);
-export const side = pgEnum('side', ['BLUE', 'RED']);
+
+export const sides = ['BLUE', 'RED'] as const;
+export const side = pgEnum('side', sides);
+
+export const lolPositions = ['TOP', 'JUNGLE', 'MID', 'BOTTOM', 'SUPPORT'] as const;
+export const lolPosition = pgEnum('lol_position', lolPositions);
 
 export const usersInAuth = pgTable('users', {
 	id: uuid('id').primaryKey(),
 });
 
-export const formatAbbrevation = pgTable('format_abbrevation', {
+export const formatAbbreviation = pgTable('format_abbreviation', {
 	format: format().notNull(),
-	abbrevation: text().notNull(),
+	abbreviation: text().notNull(),
 });
 
 export const championBan = pgTable('champion_ban', {
@@ -88,6 +95,7 @@ export const gameMatchupRelation = pgTable('game_matchup_relation', {
 		mode: 'number',
 	}).notNull(),
 	matchupId: integer('matchup_id').notNull(),
+	ordering: smallint('ordering'),
 }, table => [
 	primaryKey({
 		columns: [
@@ -258,16 +266,14 @@ export const gameTeamStats = pgTable('game_team_stats', {
 ]);
 
 export const matchup = pgTable('matchup', {
-	matchupId: bigint('matchup_id', {
-		mode: 'number',
-	}).generatedByDefaultAsIdentity({
+	matchupId: integer('matchup_id').generatedByDefaultAsIdentity({
 		name: 'matchup_matchup_id_seq',
 		startWith: 1,
 		increment: 1,
 		minValue: 1,
 		maxValue: '9223372036854775807',
 		cache: 1,
-	}),
+	}).primaryKey(),
 	shortId: text('short_id')
 		.generatedAlwaysAs(
 			sql`encode_id_salted(matchup_id, private.get_salt('matchup'::text))`,
@@ -356,16 +362,14 @@ export const player = pgTable('player', {
 });
 
 export const team = pgTable('team', {
-	teamId: bigint('team_id', {
-		mode: 'number',
-	}).generatedByDefaultAsIdentity({
+	teamId: integer('team_id').generatedByDefaultAsIdentity({
 		name: 'team_team_id_seq',
 		startWith: 1,
 		increment: 1,
 		minValue: 1,
 		maxValue: '9223372036854775807',
 		cache: 1,
-	}),
+	}).primaryKey(),
 	createdAt: timestamp('created_at', {
 		precision: 6,
 		withTimezone: true,
@@ -375,7 +379,7 @@ export const team = pgTable('team', {
 		.notNull(),
 	tournamentId: integer('tournament_id').notNull(),
 	name: text().notNull(),
-	shorthand: text(),
+	abbreviation: text(),
 	shortId: text('short_id').generatedAlwaysAs(
 		sql`encode_id_salted(team_id, private.get_salt('team'::text))`,
 	)
@@ -398,16 +402,14 @@ export const team = pgTable('team', {
 
 export const tournament = pgTable('tournament', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	tournamentId: bigint('tournament_id', {
-		mode: 'number',
-	}).generatedByDefaultAsIdentity(
+	tournamentId: integer('tournament_id').generatedByDefaultAsIdentity(
 		{ name: 'tournament_tournament_id_seq',
 			startWith: 1,
 			increment: 1,
 			minValue: 1,
 			maxValue: '9223372036854775807',
 			cache: 1,
-		}),
+		}).primaryKey(),
 	shortId: text('short_id').generatedAlwaysAs(
 		sql`encode_id_salted(tournament_id, private.get_salt('tournament'::text))`,
 	)
@@ -444,8 +446,9 @@ export const tournament = pgTable('tournament', {
 export const tournamentParticipant = pgTable('tournament_participant', {
 	puuid: text().notNull(),
 	tournamentId: integer('tournament_id').notNull(),
-	name: text().notNull(),
+	name: text(),
 	teamId: integer('team_id'),
+	teamPosition: lolPosition(),
 }, table => [
 	primaryKey({
 		columns: [
@@ -475,7 +478,7 @@ export const tournamentParticipant = pgTable('tournament_participant', {
 
 export const tournamentShareToken = pgTable('tournament_share_token', {
 	// You can use { mode: "bigint" } if numbers are exceeding js number limitations
-	id: bigint({ mode: 'number' }).generatedByDefaultAsIdentity({ name: 'tournament_share_token_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: '9223372036854775807', cache: 1 }),
+	id: integer().generatedByDefaultAsIdentity({ name: 'tournament_share_token_id_seq', startWith: 1, increment: 1, minValue: 1, maxValue: '9223372036854775807', cache: 1 }).primaryKey(),
 	shareToken: text('share_token').notNull(),
 	tournamentId: integer('tournament_id').notNull(),
 }, table => [

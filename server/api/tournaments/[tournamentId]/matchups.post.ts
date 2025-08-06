@@ -1,31 +1,45 @@
-import * as z from 'zod/v4';
+import { z } from 'zod/v4';
 
-import { Format } from '~~/@types/database.types';
+import { eq, and } from 'drizzle-orm';
 
-const teamId = z.string();
-
-const _ = z.object({
-	team1_id: teamId,
-	team2_id: teamId,
-	format: z.enum(Format),
+const PathParams = z.object({
+	tournamentId: z.string().min(1),
 });
 
-/**
- * POST /api/tournaments/[tournamentId]/matchups/
- *
- * Creates a matchup between two teams in a specific tournament
- *
- * Returns: information about the matchup
- * 	team1: { team_id: string }
- * 	team2: { team_id: string }
- * 	tournament_id: string
- * 	format: Format
- */
+const RequestBody = z.object({
+	team1Id: z.string(),
+	team2Id: z.string(),
+	format: z.enum(formats),
+});
+
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
-	handler: withErrorHandling((event) => {
-		return event.toString();
+	handler: withErrorHandling(async (event) => {
+		const user = await requireAuthorization(event);
+		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
+		const { team1Id, team2Id, format } = await readValidatedBody(event, obj => RequestBody.parse(obj));
+
+		const context = await db.select({
+			tournamentId: tournament.tournamentId,
+		})
+			.from(tournament)
+			.where(
+				and(
+					eq(tournament.shortId, tournamentId),
+					hasTournamentModifyPermissions(user),
+				),
+			)
+			.then(maybeSingle);
+
+		if (!context) {
+			throw createNotFoundError('Tournament');
+		}
+		const insertedMatchupCTE = db.$with('inserted_matchup').as(
+			db.insert(matchup)
+				.values({ team1Id: 1, team2Id: 1, tournamentId: 1, format: format })
+				.returning(),
+		);
 	}),
 });

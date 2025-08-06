@@ -1,5 +1,3 @@
-import type { openAPISchema } from '@types';
-
 export const docs: openAPISchema = {
 	tags: ['tournament'],
 	summary: 'Update Team Roster',
@@ -111,13 +109,13 @@ export const docs: openAPISchema = {
 								puuid: 'Zz2sEt4n_mfS37AyXSqXnNw4eXDHHRfsYXD2FQb7jOLIrttOjtIe88cu_fKqwkPVgCSc_4slSNSrbg',
 								name: 'T1 Faker',
 								gameName: 'Hide on Bush',
-								gameTag: 'KR1',
+								tagLine: 'KR1',
 							},
 							{
 								puuid: '-_39jej0AK9hmOi7qlTJNUMMX9F1V4_iDXXxiGH21co6RxS1zMXjJphnSkLAaRejfFYm2NUhc2b3zg',
 								name: 'T1 Gumayusi',
 								gameName: 'T1 Gumayusi',
-								gameTag: 'KR1',
+								tagLine: 'KR1',
 							},
 						],
 						removed: [
@@ -125,7 +123,7 @@ export const docs: openAPISchema = {
 								puuid: 'E_11ihAQLGrIdPY_gYav8rIcWeQOymLYZN2x4NdQvvM7nHKNGcn85quvFwXcwrlPC3zcjoVagYG-Tg',
 								name: 'T1 Smash',
 								gameName: 'T1 Smash',
-								gameTag: 'KR3',
+								tagLine: 'KR3',
 							},
 						],
 					},

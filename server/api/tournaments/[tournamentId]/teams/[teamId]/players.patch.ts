@@ -2,9 +2,10 @@ import * as z from 'zod/v4';
 
 import { and, eq, sql, notExists, inArray } from 'drizzle-orm';
 
+import type { Simplify } from 'type-fest';
+
 import { docs } from '@server/docs/tournaments/[tournamentId]/teams/[teamId]/players.patch.docs';
-import { RiotError } from 'riotapi-fetch-typed';
-import type { LolRegion } from 'riotapi-fetch-typed';
+import { RiotError, type LolRegion } from 'riotapi-fetch-typed';
 
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
@@ -39,7 +40,7 @@ export default defineEventHandler({
 		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 		const { add, remove } = await readValidatedBody(event, data => RequestBody.parse(data));
 
-		// check permissions, get information about tournament
+		// check permissions, get information about tournament/team
 		// region needed for fetching players
 		// ids needed for deleting
 		const context = await db.select({
@@ -52,6 +53,7 @@ export default defineEventHandler({
 			.where(
 				and(
 					eq(tournament.shortId, tournamentId),
+					eq(team.shortId, teamId),
 					hasTournamentModifyPermissions(user),
 				),
 			)
@@ -90,6 +92,7 @@ export default defineEventHandler({
 		const { added, removed } = await db.transaction(async (tx) => {
 			let added;
 			if (add && add.length > 0) {
+				// cte with placeholders and batch insert
 				const insertedPlayerCTE = tx.$with('inserted_player').as(
 					tx.insert(tournamentParticipant)
 						.values({
@@ -101,16 +104,17 @@ export default defineEventHandler({
 						.returning(),
 				);
 
+				// use cte to get short ids from the inserted players
+				// in theory this is useless because its the same for all?
 				const prepared = db.with(insertedPlayerCTE)
 					.select({
-						teamId: team.shortId,
-						tournamentId: tournament.shortId,
 						puuid: insertedPlayerCTE.puuid,
 						name: insertedPlayerCTE.name,
+						gameName: player.gameName,
+						tagLine: player.tagLine,
 					})
 					.from(insertedPlayerCTE)
-					.innerJoin(tournament, eq(insertedPlayerCTE.tournamentId, tournament.tournamentId))
-					.innerJoin(team, eq(insertedPlayerCTE.teamId, team.teamId))
+					.innerJoin(player, eq(player.puuid, insertedPlayerCTE.puuid))
 					.prepare('insert_player');
 
 				added = await Promise.all(add.map(async (player) => {
@@ -125,16 +129,25 @@ export default defineEventHandler({
 			}
 			let removed;
 			if (remove && remove.length > 0) {
-				const removedParticipants = await db.delete(tournamentParticipant)
-					.where(
-						and(
-							eq(tournamentParticipant.tournamentId, context.tournamentId),
-							eq(tournamentParticipant.teamId, context.teamId),
-							inArray(tournamentParticipant.puuid, remove),
-						),
-					)
-					.returning();
-				removed = removedParticipants.map(p => p.puuid);
+				// work around with `using` to get player information in a single query
+
+				type Selected = Simplify<
+					Pick<typeof tournamentParticipant.$inferSelect, 'puuid' | 'name'>
+					& Pick<typeof player.$inferInsert, 'gameName' | 'tagLine'>
+				>;
+
+				const removedParticipants = await db.execute<Selected>(sql`DELETE FROM ${tournamentParticipant}
+					USING ${player}
+					WHERE ${and(
+						eq(tournamentParticipant.puuid, tournamentParticipant.puuid),
+						eq(tournamentParticipant.tournamentId, context.tournamentId),
+						eq(tournamentParticipant.teamId, context.teamId),
+						inArray(tournamentParticipant.puuid, remove),
+					)}
+					RETURNING ${tournamentParticipant.puuid}, ${tournamentParticipant.name}, ${player.gameName}, ${player.tagLine}
+					`);
+
+				removed = Array.from(removedParticipants);
 			}
 			return { added, removed };
 		});

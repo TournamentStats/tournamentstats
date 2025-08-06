@@ -1,7 +1,7 @@
 import { and, eq, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod/v4';
 
-const pathParams = z.object({
+const PathParams = z.object({
 	tournamentId: z.string().min(1),
 	teamId: z.string().min(1),
 });
@@ -20,7 +20,7 @@ export default defineEventHandler({
 	handler: withErrorHandling(async (event) => {
 		const user = event.context.auth.user;
 
-		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => pathParams.parse(obj));
+		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 		const { shortId, createdAt, ...rest } = getTableColumns(team);
 		const selectedTeam = await db.select({
 			...rest,
@@ -45,8 +45,8 @@ export default defineEventHandler({
 		const imageUrl = await getSignedTeamImage(event, selectedTeam.tournamentId, selectedTeam.teamId);
 
 		return {
-			imageUrl,
 			...selectedTeam,
+			imageUrl,
 		};
 	}),
 });

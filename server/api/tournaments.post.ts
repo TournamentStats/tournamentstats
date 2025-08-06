@@ -1,30 +1,22 @@
 import * as z from 'zod/v4';
 
 import { getTableColumns } from 'drizzle-orm';
-import { single } from '~~/server/utils/drizzle/utils';
 
-const requestBody = z.object({
+const RequestBody = z.object({
 	name: z.string().min(3).max(32),
 	isPrivate: z.boolean(),
 	imageId: z.string().optional(),
 	region: z.enum(regions),
 });
 
-/**
- * POST /api/tournaments
- *
- * Creates a tournament
- *
- * ResponseBody: tournament
- */
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
 	],
 	handler: withErrorHandling(async (event) => {
-		const user = event.context.auth.user!;
+		const user = await requireAuthorization(event);
 
-		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => requestBody.parse(data));
+		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => RequestBody.parse(data));
 
 		const insertedTournament = await db.transaction(async (tx) => {
 			const { shortId, createdAt, ...rest } = getTableColumns(tournament);
@@ -45,8 +37,8 @@ export default defineEventHandler({
 			}
 
 			return {
-				imageUrl,
 				...insertedTournament,
+				imageUrl,
 			};
 		});
 

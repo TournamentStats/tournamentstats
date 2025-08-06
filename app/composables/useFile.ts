@@ -61,7 +61,7 @@ export function UseFile(
 			});
 		}
 
-		inputElement.value?.addEventListener('change', (e) => {
+		inputElement.value?.addEventListener('change', (_) => {
 			file.value = inputElement.value?.files?.[0] ?? null;
 		});
 	});

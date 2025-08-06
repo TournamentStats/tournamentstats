@@ -2,6 +2,8 @@ import { H3Error } from 'h3';
 import type { H3Event } from 'h3';
 import { ZodError, z } from 'zod/v4';
 
+import { consola } from 'consola';
+
 export function createGenericError({ statusCode, statusMessage, message }: { statusCode?: number; statusMessage?: string; message?: string } = {}) {
 	return createError({
 		statusCode: statusCode ?? 500,

@@ -1,5 +1,9 @@
+import { install } from 'source-map-support';
+
 export default defineNitroPlugin((nitroApp) => {
-	console.log('setup');
+	install({
+		handleUncaughtExceptions: false,
+	});
 	nitroApp.hooks.hook('error', (error) => {
 		logger.error('unhandled exception', { section: 'error-hook', payload: error });
 	});
