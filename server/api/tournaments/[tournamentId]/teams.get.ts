@@ -12,35 +12,37 @@ export default defineEventHandler({
 	handler: withErrorHandling(async (event) => {
 		const user = event.context.auth.user;
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
-		const { shortId, createdAt, ...rest } = getTableColumns(team);
-		let selectedTeams = await db.select({
+		const { shortId, createdAt, ...rest } = getTableColumns(teamTable);
+		let result = await db.select({
 			...rest,
-			teamId: team.shortId,
-			tournamentId: tournament.shortId,
+			teamId: teamTable.shortId,
+			tournamentId: tournamentTable.shortId,
 		})
-			.from(tournament)
-			.leftJoin(team, eq(team.tournamentId, tournament.tournamentId))
+			.from(tournamentTable)
+			.leftJoin(teamTable, eq(teamTable.tournamentId, tournamentTable.tournamentId))
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
+					eq(tournamentTable.shortId, tournamentId),
 					hasTournamentViewPermissions(user),
 				),
 			);
 
-		if (selectedTeams.length === 0) {
+		if (result.length === 0) {
 			// couldn't find a tournament at all
 			throw createNotFoundError('Tournament');
 		}
 
-		if (selectedTeams[0]!.teamId == null) {
+		if (result[0]!.teamId == null) {
 			// our left join resulted in zero matching teams
-			selectedTeams = [];
+			result = [];
 		}
 
 		const teamsWithImages = await Promise.all(
-			selectedTeams.map(async t => ({
-				...t,
-				imageUrl: await getSignedTeamImage(event, t.tournamentId, t.teamId!),
+			result.map(async row => ({
+				teamId: row.teamId,
+				name: row.name,
+				abbrevation: row.abbreviation,
+				imageUrl: await getSignedTeamImage(event, row.tournamentId, row.teamId!),
 			})),
 		);
 

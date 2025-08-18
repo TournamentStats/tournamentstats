@@ -19,16 +19,16 @@ export default defineEventHandler({
 		const { name, isPrivate, imageId, region } = await readValidatedBody(event, data => RequestBody.parse(data));
 
 		const insertedTournament = await db.transaction(async (tx) => {
-			const { shortId, createdAt, ...rest } = getTableColumns(tournament);
+			const { shortId, createdAt, ...rest } = getTableColumns(tournamentTable);
 
-			const insertedTournament = await tx.insert(tournament)
+			const insertedTournament = await tx.insert(tournamentTable)
 				.values({
 					name,
 					isPrivate,
 					ownerId: user.id,
 					region,
 				})
-				.returning({ ...rest, id: tournament.shortId })
+				.returning({ ...rest, id: tournamentTable.shortId })
 				.then(single);
 
 			let imageUrl = null;

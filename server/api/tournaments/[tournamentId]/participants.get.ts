@@ -10,6 +10,7 @@ const QueryParams = z.object({
 	team: z.string().optional(),
 	position: z.enum(lolPositions).optional(),
 });
+
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
@@ -23,33 +24,33 @@ export default defineEventHandler({
 		const filterArray = [];
 
 		if (filters.team) {
-			filterArray.push(eq(team.shortId, filters.team));
+			filterArray.push(eq(teamTable.shortId, filters.team));
 		}
 
 		if (filters.position) {
-			eq(tournamentParticipant.teamPosition, filters.position);
+			filterArray.push(eq(tournamentParticipantTable.teamPosition, filters.position));
 		}
 
 		let selectedParticipants = await db.select({
-			puuid: player.puuid,
-			gameName: player.gameName,
-			tagLine: player.tagLine,
-			profileIconId: player.profileIconId,
-			name: tournamentParticipant.name,
-			teamPosition: tournamentParticipant.teamPosition,
+			puuid: playerTable.puuid,
+			gameName: playerTable.gameName,
+			tagLine: playerTable.tagLine,
+			profileIconId: playerTable.profileIconId,
+			name: tournamentParticipantTable.name,
+			teamPosition: tournamentParticipantTable.teamPosition,
 			team: {
-				teamId: team.shortId,
-				abbreviation: team.abbreviation,
-				teamName: team.name,
+				teamId: teamTable.shortId,
+				abbreviation: teamTable.abbreviation,
+				teamName: teamTable.name,
 			},
 		})
-			.from(tournament)
-			.leftJoin(tournamentParticipant, eq(tournamentParticipant.tournamentId, tournament.tournamentId))
-			.leftJoin(player, eq(player.puuid, tournamentParticipant.puuid))
-			.leftJoin(team, eq(team.teamId, tournamentParticipant.teamId))
+			.from(tournamentTable)
+			.leftJoin(tournamentParticipantTable, eq(tournamentParticipantTable.tournamentId, tournamentTable.tournamentId))
+			.leftJoin(playerTable, eq(playerTable.puuid, tournamentParticipantTable.puuid))
+			.leftJoin(teamTable, eq(teamTable.teamId, tournamentParticipantTable.teamId))
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
+					eq(tournamentTable.shortId, tournamentId),
 					hasTournamentViewPermissions(user),
 					...filterArray,
 				),

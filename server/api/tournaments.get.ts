@@ -1,5 +1,5 @@
 import { getTableColumns } from 'drizzle-orm';
-import { getSignedTournamentImage } from '~~/server/utils/supabase/images';
+import { getSignedTournamentImage } from '~~/server/utils/storage/images';
 import { withErrorHandling } from '~~/server/utils/errors';
 
 defineRouteMeta({
@@ -19,12 +19,12 @@ export default defineEventHandler({
 
 		// remove shortId and createdAt from result
 		// assign tournamentId our short id alias
-		const { shortId, createdAt, ...rest } = getTableColumns(tournament);
+		const { shortId, createdAt, ...rest } = getTableColumns(tournamentTable);
 		const selectedTournaments = await db.select({
 			...rest,
-			tournamentId: tournament.shortId,
+			tournamentId: tournamentTable.shortId,
 		})
-			.from(tournament)
+			.from(tournamentTable)
 			.where(
 				hasTournamentViewPermissions(user),
 			);

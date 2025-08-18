@@ -5,7 +5,7 @@
 import { randomBytes } from 'crypto';
 import type { H3Event } from 'h3';
 
-import { image_ids } from '~~/server/utils/sqids';
+import { imageIds } from '~~/server/utils/sqids';
 import { logger } from '~~/server/utils/logging';
 
 import { serverSupabaseServiceRole } from '#supabase/server';
@@ -20,7 +20,7 @@ import { serverSupabaseServiceRole } from '#supabase/server';
  * @returns the imageId of the uploaded image
  */
 export async function uploadImage(event: H3Event, imageData: Buffer) {
-	const imageId = image_ids.encode(Array.from(randomBytes(6)));
+	const imageId = imageIds.encode(Array.from(randomBytes(6)));
 	const client = serverSupabaseServiceRole(event);
 	const uploadImageResponse = await client.storage.from('tournament-images')
 		.upload(

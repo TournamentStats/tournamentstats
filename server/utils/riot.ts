@@ -1,4 +1,4 @@
-import { createRiotFetch } from 'riotapi-fetch-typed';
+import { createRiotFetch, RiotError } from 'riotapi-fetch-typed';
 import type { LolRegion } from 'riotapi-fetch-typed';
 
 export const riotFetch = createRiotFetch({
@@ -31,10 +31,36 @@ export function regionToCluster(region: LolRegion) {
 	}
 }
 
-// const riotFetch: typeof riotFetchInternal = async (...args) => {
-// 	const { response, data, error } = await riotFetchInternal(...args)
+export async function fetchPlayer(puuid: string, region: LolRegion) {
+	let account: Account;
+	try {
+		account = (await riotFetch(`/riot/account/v1/accounts/by-puuid/${puuid}`, {
+			region: regionToCluster(region),
+		})).data;
+	}
+	catch (e: unknown) {
+		if (e instanceof RiotError) {
+			if (e.statusCode === 404) {
+				throw createNotFoundError('PUUID');
+			}
+		}
+		throw e;
+	}
 
-// 	if (error) {
-// 		throw createGenericError
-// 	}
-// }
+	let summoner: Summoner;
+	try {
+		summoner = (await riotFetch(`/lol/summoner/v4/summoners/by-puuid/${puuid}`, {
+			region,
+		})).data;
+	}
+	catch (e: unknown) {
+		if (e instanceof RiotError) {
+			if (e.statusCode === 404) {
+				throw createNotFoundError('Summoner');
+			}
+		}
+		throw e;
+	}
+
+	return { account, summoner };
+}

@@ -45,7 +45,6 @@ class ConsolaTransport extends TransportStream {
 	}
 }
 
-// Helper function to format payloads as JSON
 const formatPayload = (payload: object): string => JSON.stringify(payload, null, 4);
 
 function indentStack(stack: string | undefined, indent = 4): string {

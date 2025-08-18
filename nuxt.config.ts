@@ -53,7 +53,7 @@ export default defineNuxtConfig({
 		'#build': resolve(__dirname, '.nuxt'),
 		'#internal/nuxt/paths': resolve(__dirname, '.nuxt/paths.mjs'),
 		'@server': resolve(__dirname, 'server'),
-		'@types': resolve(__dirname, '@types'),
+		'@types': resolve(__dirname, 'server/@types'),
 	},
 	build: {
 		transpile: ['riot-games-fetch-typed'],
@@ -85,9 +85,7 @@ export default defineNuxtConfig({
 			},
 		},
 		imports: {
-			dirs: [
-				'server/utils',
-			],
+			autoImport: false,
 		},
 		experimental: {
 			openAPI: true,

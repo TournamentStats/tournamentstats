@@ -22,24 +22,24 @@ export default defineEventHandler({
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 		const { name, isPrivate, startDate, endDate, imageId } = await readValidatedBody(event, obj => RequestBody.parse(obj));
 
-		const { shortId, createdAt, ...rest } = getTableColumns(tournament);
+		const { shortId, createdAt, ...rest } = getTableColumns(tournamentTable);
 		const updatedTournament = await db.transaction(async (tx) => {
-			const updatedTournament = await tx.update(tournament)
+			const updatedTournament = await tx.update(tournamentTable)
 				.set({
 					name,
 					isPrivate,
-					startDate: startDate?.toUTCString(),
-					endDate: endDate?.toUTCString(),
+					startDate: startDate ?? new Date(),
+					endDate: endDate,
 				})
 				.where(
 					and(
-						eq(tournament.shortId, tournamentId),
+						eq(tournamentTable.shortId, tournamentId),
 						hasTournamentModifyPermissions(user),
 					),
 				)
 				.returning({
 					...rest,
-					tournamentId: tournament.shortId,
+					tournamentId: tournamentTable.shortId,
 				})
 				.then(maybeSingle);
 

@@ -20,11 +20,12 @@ export default defineEventHandler({
 
 		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 
-		await db.delete(team)
+		// TODO: Fix Filter
+		await db.delete(teamTable)
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
-					eq(team.shortId, teamId),
+					eq(tournamentTable.shortId, tournamentId),
+					eq(teamTable.shortId, teamId),
 					hasTournamentModifyPermissions(user),
 				),
 			);

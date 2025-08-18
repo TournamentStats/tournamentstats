@@ -14,15 +14,15 @@ export default defineEventHandler({
 		const user = event.context.auth.user;
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 
-		const { shortId, createdAt, ...rest } = getTableColumns(tournament);
+		const { shortId, createdAt, ...rest } = getTableColumns(tournamentTable);
 		const selectedTournament = await db.select({
 			...rest,
-			tournamentId: tournament.shortId,
+			tournamentId: tournamentTable.shortId,
 		})
-			.from(tournament)
+			.from(tournamentTable)
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
+					eq(tournamentTable.shortId, tournamentId),
 					hasTournamentViewPermissions(user),
 				),
 			)

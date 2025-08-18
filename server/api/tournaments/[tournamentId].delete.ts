@@ -14,14 +14,14 @@ export default defineEventHandler({
 	handler: withErrorHandling(async (event) => {
 		const user = await requireAuthorization(event);
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
-		const deletedTournament = await db.delete(tournament)
+		const deletedTournament = await db.delete(tournamentTable)
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
+					eq(tournamentTable.shortId, tournamentId),
 					hasTournamentDeletePermissions(user),
 				),
 			)
-			.returning({ shortId: tournament.shortId })
+			.returning({ shortId: tournamentTable.shortId })
 			.then(maybeSingle);
 
 		if (!deletedTournament) {

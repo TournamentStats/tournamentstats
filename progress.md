@@ -1,32 +1,61 @@
-# Server Progress
+# Server Endpoint Progress
 
 - [x] [./server/api/me.get.ts](./server/api/me.get.ts)
-- [ ] players
-  - [ ] [./server/api/players/[puuid]/renewal.post.ts](./server/api/players/[puuid]/renewal.post.ts)
-- [ ] tournaments
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].get.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.get.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.post.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.post.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId].get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId].get.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups.get.ts](./server/api/tournaments/[tournamentId]/matchups.get.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/matchups.post.ts](./server/api/tournaments/[tournamentId]/matchups.post.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/participants/[riotId]/stats.get.ts](./server/api/tournaments/[tournamentId]/participants/[riotId]/stats.get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/participants.get.ts](./server/api/tournaments/[tournamentId]/participants.get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams/[teamId]/players.get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/players.get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams/[teamId]/players.patch.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/players.patch.ts)
-  - [ ] [./server/api/tournaments/[tournamentId]/teams/[teamId]/stats.get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/stats.get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].delete.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].delete.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].patch.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].patch.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams.get.ts](./server/api/tournaments/[tournamentId]/teams.get.ts)
-  - [x] [./server/api/tournaments/[tournamentId]/teams.post.ts](./server/api/tournaments/[tournamentId]/teams.post.ts)
-  - [x] [./server/api/tournaments/[tournamentId].delete.ts](./server/api/tournaments/[tournamentId].delete.ts)
-  - [x] [./server/api/tournaments/[tournamentId].get.ts](./server/api/tournaments/[tournamentId].get.ts)
-  - [x] [./server/api/tournaments/[tournamentId].patch.ts](./server/api/tournaments/[tournamentId].patch.ts)
-  - [x] [./server/api/tournaments/images.post.ts](./server/api/tournaments/images.post.ts)
-  - [x] [./server/api/tournaments.get.ts](./server/api/tournaments.get.ts)
-  - [x] [./server/api/tournaments.post.ts](./server/api/tournaments.post.ts)
 
+## Player Related Endpoints
+
+- [ ] [./server/api/players/[puuid]/renewal.post.ts](./server/api/players/[puuid]/renewal.post.ts)
+
+## Tournament Related Endpoints
+
+- [x] [./server/api/tournaments/images.post.ts](./server/api/tournaments/images.post.ts)
+- [x] [./server/api/tournaments.get.ts](./server/api/tournaments.get.ts)
+- [x] [./server/api/tournaments.post.ts](./server/api/tournaments.post.ts)
+
+- [x] [./server/api/tournaments/[tournamentId].delete.ts](./server/api/tournaments/[tournamentId].delete.ts)
+- [x] [./server/api/tournaments/[tournamentId].get.ts](./server/api/tournaments/[tournamentId].get.ts)
+- [x] [./server/api/tournaments/[tournamentId].patch.ts](./server/api/tournaments/[tournamentId].patch.ts)
+
+### Team Related Endpoints
+
+- [x] [./server/api/tournaments/[tournamentId]/teams.get.ts](./server/api/tournaments/[tournamentId]/teams.get.ts)
+- [x] [./server/api/tournaments/[tournamentId]/teams.post.ts](./server/api/tournaments/[tournamentId]/teams.post.ts)
+
+- [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].delete.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].delete.ts)
+- [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].get.ts)
+- [x] [./server/api/tournaments/[tournamentId]/teams/[teamId].patch.ts](./server/api/tournaments/[tournamentId]/teams/[teamId].patch.ts)
+
+#### Team Member Related Endpoints
+
+- [x] [./server/api/tournaments/[tournamentId]/teams/[teamId]/players.get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/players.get.ts)
+- [x] [./server/api/tournaments/[tournamentId]/teams/[teamId]/players.patch.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/players.patch.ts)
+
+### Matchup Related Endpoints
+
+- [x] [./server/api/tournaments/[tournamentId]/matchups.get.ts](./server/api/tournaments/[tournamentId]/matchups.get.ts)
+- [x] [./server/api/tournaments/[tournamentId]/matchups.post.ts](./server/api/tournaments/[tournamentId]/matchups.post.ts)
+
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId].delete.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId].delete.ts)
+- [x] [./server/api/tournaments/[tournamentId]/matchups/[matchupId].get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId].get.ts)
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId].patch.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId].patch.ts)
+
+#### Game Related Endpoints
+
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.get.ts)
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.post.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games.post.ts)
+
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].delete.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].delete.ts)
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].get.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].get.ts)
+- [ ] [./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].patch.ts](./server/api/tournaments/[tournamentId]/matchups/[matchupId]/games/[gameId].patch.ts)
+
+## Participant Related Endpoints
+
+- [x] [./server/api/tournaments/[tournamentId]/participants.get.ts](./server/api/tournaments/[tournamentId]/participants.get.ts)
+
+## Stats Related Endpoints
+
+- [ ] [./server/api/tournaments/[tournamentId]/teams/[teamId]/stats.get.ts](./server/api/tournaments/[tournamentId]/teams/[teamId]/stats.get.ts)
+- [ ] [./server/api/tournaments/[tournamentId]/participants/[riotId]/stats.get.ts](./server/api/tournaments/[tournamentId]/participants/[riotId]/stats.get.ts)
 
 ## Documentation
 

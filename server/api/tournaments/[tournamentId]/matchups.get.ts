@@ -7,6 +7,9 @@ const PathParams = z.object({
 	tournamentId: z.string().min(1),
 });
 
+const team1 = alias(teamTable, 'team1');
+const team2 = alias(teamTable, 'team2');
+
 export default defineEventHandler({
 	onBeforeResponse: [
 		logAPI,
@@ -15,13 +18,10 @@ export default defineEventHandler({
 		const user = await getUser(event);
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
 
-		const team1 = alias(team, 'team1');
-		const team2 = alias(team, 'team2');
-
 		let selectedMatchupsRows = await db.select({
 			matchup: {
-				matchupId: matchup.shortId,
-				format: matchup.format,
+				matchupId: matchupTable.shortId,
+				format: matchupTable.format,
 			},
 			team1: {
 				teamId: team1.shortId,
@@ -34,25 +34,25 @@ export default defineEventHandler({
 				abbreviation: team2.abbreviation,
 			},
 			game: {
-				gameId: gameMatchupRelation.gameId,
-				ordering: gameMatchupRelation.ordering,
+				gameId: gameMatchupRelationTable.gameId,
+				ordering: gameMatchupRelationTable.ordering,
 			},
 		})
-			.from(tournament)
-			.leftJoin(matchup, eq(matchup.tournamentId, tournament.tournamentId))
-			.leftJoin(team1, eq(team1.teamId, matchup.team1Id))
-			.leftJoin(team2, eq(team2.teamId, matchup.team1Id))
+			.from(tournamentTable)
+			.leftJoin(matchupTable, eq(matchupTable.tournamentId, tournamentTable.tournamentId))
+			.leftJoin(team1, eq(team1.teamId, matchupTable.team1Id))
+			.leftJoin(team2, eq(team2.teamId, matchupTable.team2Id))
 			.leftJoin(
-				gameMatchupRelation,
-				eq(gameMatchupRelation.matchupId, matchup.matchupId),
+				gameMatchupRelationTable,
+				eq(gameMatchupRelationTable.matchupId, matchupTable.matchupId),
 			)
 			.leftJoin(
-				game,
-				eq(game.gameId, gameMatchupRelation.gameId),
+				gameTable,
+				eq(gameTable.gameId, gameMatchupRelationTable.gameId),
 			)
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
+					eq(tournamentTable.shortId, tournamentId),
 					hasTournamentViewPermissions(user),
 				),
 			);
@@ -65,27 +65,55 @@ export default defineEventHandler({
 			selectedMatchupsRows = [];
 		}
 
-		const selectedMatchups = selectedMatchupsRows.reduce<Record<string, MatchupDetails>>((acc, row) => {
+		// collect all promises for team images without duplicates and batch execute them
+		const teamImagesPromises = new Map<string, Promise<string | null>>();
+
+		for (const row of selectedMatchupsRows) {
+			if (row.team1 && !teamImagesPromises.has(row.team1.teamId)) {
+				teamImagesPromises.set(row.team1.teamId, getSignedTeamImage(event, tournamentId, row.team1.teamId));
+			}
+			if (row.team2 && !teamImagesPromises.has(row.team2.teamId)) {
+				teamImagesPromises.set(row.team2.teamId, getSignedTeamImage(event, tournamentId, row.team2.teamId));
+			}
+		}
+
+		const teamIds = Array.from(teamImagesPromises.keys());
+		const results = await Promise.all(teamImagesPromises.values());
+		const teamImages = new Map<string, string | null>();
+		results.forEach((image, i) => {
+			teamImages.set(teamIds[i]!, image);
+		});
+
+		// aggregate our rows
+		const selectedMatchups: Record<string, MatchupDetails> = {};
+		for (const row of selectedMatchupsRows) {
 			const currentMatchup = row.matchup;
 			const team1 = row.team1;
 			const team2 = row.team2;
 			const currentGame = row.game;
 
-			if (currentMatchup == null || team1 == null || team2 == null) return acc;
+			if (currentMatchup == null || team1 == null || team2 == null) {
+				continue;
+			}
 
-			acc[currentMatchup.matchupId] ??= {
+			selectedMatchups[currentMatchup.matchupId] ??= {
 				...currentMatchup,
-				team1,
-				team2,
+				team1: {
+					...team1,
+					imageUrl: teamImages.get(team1.teamId) ?? null,
+				},
+				team2: {
+					...team2,
+					imageUrl: teamImages.get(team2.teamId) ?? null,
+				},
 				games: [],
 			};
 
 			if (currentGame) {
-				acc[currentMatchup.matchupId]!.games.push(currentGame);
+				selectedMatchups[currentMatchup.matchupId]!.games.push(currentGame);
 			}
+		}
 
-			return acc;
-		}, {});
 		return selectedMatchups;
 	}),
 });

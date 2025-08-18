@@ -1,6 +1,6 @@
 import * as z from 'zod/v4';
 
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
@@ -8,7 +8,7 @@ const PathParams = z.object({
 
 const RequestBody = z.object({
 	name: z.string().min(3).max(32),
-	shorthand: z.string().min(1).max(5).optional(),
+	abbreviation: z.string().min(1).max(5).optional(),
 	imageId: z.string().optional(),
 });
 
@@ -19,46 +19,46 @@ export default defineEventHandler({
 	handler: withErrorHandling(async (event) => {
 		const user = await requireAuthorization(event);
 		const { tournamentId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
-		const { name, shorthand, imageId } = await readValidatedBody(event, obj => RequestBody.parse(obj));
+		const { name, abbreviation, imageId } = await readValidatedBody(event, obj => RequestBody.parse(obj));
+
+		const context = await db.select({
+			tournamentId: tournamentTable.tournamentId,
+		})
+			.from(tournamentTable)
+			.where(
+				and(
+					eq(tournamentTable.shortId, tournamentId),
+					hasTournamentModifyPermissions(user),
+				),
+			)
+			.then(maybeSingle);
+
+		if (!context) {
+			throw createNotFoundError('Tournament');
+		}
 
 		const createdTeam = await db.transaction(async (tx) => {
-			// use cte to insert tournamentId from tournament table with permission check
-			// all in one query
+			// use cte to insert tournamentId
 			const insertedTeamCTE = tx.$with('inserted_team').as(
-				tx.insert(team)
-					.select(
-						tx.select({
-							tournamentId: tournament.tournamentId,
-							name: sql<string>`${name}`.as('name'),
-							shorthand: sql<string | null>`${shorthand ?? null}`.as('shorthand'),
-						})
-							.from(tournament)
-							.where(
-								and(
-									eq(tournament.shortId, tournamentId),
-									hasTournamentModifyPermissions(user),
-								),
-							),
-					)
+				tx.insert(teamTable)
+					.values({
+						tournamentId: context.tournamentId,
+						name,
+						abbreviation,
+					})
 					.returning(),
 			);
 			// use cte to join tournament for short id
 			const createdTeam = await tx.with(insertedTeamCTE)
 				.select({
 					teamId: insertedTeamCTE.shortId,
-					tournamentId: tournament.shortId,
+					tournamentId: tournamentTable.shortId,
 					name: insertedTeamCTE.name,
 					shorthand: insertedTeamCTE.abbreviation,
 				})
 				.from(insertedTeamCTE)
-				.innerJoin(tournament, eq(insertedTeamCTE.tournamentId, tournament.tournamentId))
-				.then(maybeSingle);
-
-			// if no team was created, either tournament didn't exist or user did not
-			// have modify permissions
-			if (!createdTeam) {
-				throw createNotFoundError('Tournament');
-			}
+				.innerJoin(tournamentTable, eq(insertedTeamCTE.tournamentId, tournamentTable.tournamentId))
+				.then(single);
 
 			let imageUrl = null;
 			if (imageId) {

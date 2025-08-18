@@ -1,5 +1,6 @@
 import { and, eq, getTableColumns } from 'drizzle-orm';
 import * as z from 'zod/v4';
+import { teamTable, tournamentTable } from '../../../../utils/drizzle/db/schema';
 
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
@@ -21,18 +22,18 @@ export default defineEventHandler({
 		const user = event.context.auth.user;
 
 		const { tournamentId, teamId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
-		const { shortId, createdAt, ...rest } = getTableColumns(team);
+		const { shortId, createdAt, ...rest } = getTableColumns(teamTable);
 		const selectedTeam = await db.select({
 			...rest,
-			teamId: team.shortId,
-			tournamentId: tournament.shortId,
+			teamId: teamTable.shortId,
+			tournamentId: tournamentTable.shortId,
 		})
-			.from(team)
-			.innerJoin(tournament, eq(team.tournamentId, tournament.tournamentId))
+			.from(teamTable)
+			.innerJoin(tournamentTable, eq(teamTable.tournamentId, tournamentTable.tournamentId))
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
-					eq(team.shortId, teamId),
+					eq(tournamentTable.shortId, tournamentId),
+					eq(teamTable.shortId, teamId),
 					hasTournamentViewPermissions(user),
 				),
 			)

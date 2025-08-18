@@ -2,21 +2,32 @@ import { H3Error } from 'h3';
 import type { H3Event } from 'h3';
 import { ZodError, z } from 'zod/v4';
 
-import { consola } from 'consola';
-
-export function createGenericError({ statusCode, statusMessage, message }: { statusCode?: number; statusMessage?: string; message?: string } = {}) {
+export function createGenericError({
+	statusCode,
+	statusMessage,
+	message,
+	data,
+}: {
+	statusCode?: number;
+	statusMessage?: string;
+	message?: string;
+	data?: object;
+} = {},
+) {
 	return createError({
 		statusCode: statusCode ?? 500,
 		statusMessage: statusMessage ?? 'Internal Server error',
 		message: message ?? 'Something unexpected happened',
+		data,
 	});
 }
 
-export function createNotFoundError(resource: string, extra?: string) {
+export function createNotFoundError(resource: string, data?: unknown) {
 	return createError({
 		statusCode: 404,
 		statusMessage: 'Not Found',
-		message: `${resource} not found${extra != undefined ? ` ${extra}` : ''}`,
+		message: `${resource} not found`,
+		data,
 	});
 }
 

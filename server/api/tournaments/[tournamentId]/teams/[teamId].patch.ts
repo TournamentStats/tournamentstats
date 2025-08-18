@@ -22,22 +22,22 @@ export default defineEventHandler({
 		const { name, abbreviation, imageId } = await readValidatedBody(event, obj => RequestBody.parse(obj));
 
 		const updatedTeam = await db.transaction(async (tx) => {
-			const { shortId, createdAt, ...rest } = getTableColumns(team);
-			const updatedTeam = await tx.update(team)
+			const { shortId, createdAt, ...rest } = getTableColumns(teamTable);
+			const updatedTeam = await tx.update(teamTable)
 				.set({ name, abbreviation })
-				.from(tournament)
+				.from(tournamentTable)
 				.where(
 					and(
-						eq(team.tournamentId, tournament.tournamentId),
-						eq(tournament.shortId, tournamentId),
-						eq(team.shortId, teamId),
+						eq(teamTable.tournamentId, tournamentTable.tournamentId),
+						eq(tournamentTable.shortId, tournamentId),
+						eq(teamTable.shortId, teamId),
 						hasTournamentModifyPermissions(user),
 					),
 				)
 				.returning({
 					...rest,
-					teamId: team.shortId,
-					tournamentId: tournament.shortId,
+					teamId: teamTable.shortId,
+					tournamentId: tournamentTable.shortId,
 				})
 				.then(maybeSingle);
 

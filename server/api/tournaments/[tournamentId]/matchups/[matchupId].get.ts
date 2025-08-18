@@ -3,6 +3,9 @@ import { z } from 'zod/v4';
 import { eq, and } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
+const team1 = alias(teamTable, 'team1');
+const team2 = alias(teamTable, 'team2');
+
 const PathParams = z.object({
 	tournamentId: z.string().min(1),
 	matchupId: z.string().min(1),
@@ -14,15 +17,15 @@ export default defineEventHandler({
 	],
 	handler: withErrorHandling(async (event) => {
 		const user = await getUser(event);
-		const { tournamentId, matchupId } = await getValidatedRouterParams(event, obj => PathParams.parse(obj));
+		const { tournamentId, matchupId } = await getValidatedRouterParams(
+			event,
+			obj => PathParams.parse(obj),
+		);
 
-		const team1 = alias(team, 'team1');
-		const team2 = alias(team, 'team2');
-
-		const selectedMatchupsRows = await db.select({
+		const result = await db.select({
 			matchup: {
-				matchupId: matchup.shortId,
-				format: matchup.format,
+				matchupId: matchupTable.shortId,
+				format: matchupTable.format,
 			},
 			team1: {
 				teamId: team1.shortId,
@@ -35,59 +38,69 @@ export default defineEventHandler({
 				abbreviation: team2.abbreviation,
 			},
 			game: {
-				gameId: gameMatchupRelation.gameId,
-				ordering: gameMatchupRelation.ordering,
+				gameId: gameMatchupRelationTable.gameId,
+				ordering: gameMatchupRelationTable.ordering,
 			},
 		})
-			.from(tournament)
-			.leftJoin(matchup, eq(matchup.tournamentId, tournament.tournamentId))
-			.leftJoin(team1, eq(team1.teamId, matchup.team1Id))
-			.leftJoin(team2, eq(team2.teamId, matchup.team1Id))
+			.from(tournamentTable)
+			.leftJoin(matchupTable, eq(matchupTable.tournamentId, tournamentTable.tournamentId))
+			.leftJoin(team1, eq(team1.teamId, matchupTable.team1Id))
+			.leftJoin(team2, eq(team2.teamId, matchupTable.team1Id))
 			.leftJoin(
-				gameMatchupRelation,
-				eq(gameMatchupRelation.matchupId, matchup.matchupId),
+				gameMatchupRelationTable,
+				eq(gameMatchupRelationTable.matchupId, matchupTable.matchupId),
 			)
 			.leftJoin(
-				game,
-				eq(game.gameId, gameMatchupRelation.gameId),
+				gameTable,
+				eq(gameTable.gameId, gameMatchupRelationTable.gameId),
 			)
 			.where(
 				and(
-					eq(tournament.shortId, tournamentId),
-					eq(matchup.shortId, matchupId),
+					eq(tournamentTable.shortId, tournamentId),
+					eq(matchupTable.shortId, matchupId),
 					hasTournamentViewPermissions(user),
 				),
 			);
 
-		if (selectedMatchupsRows.length == 0) {
+		if (result.length == 0) {
 			throw createNotFoundError('Tournament');
 		}
 
-		if (selectedMatchupsRows[0]!.matchup?.matchupId == undefined) {
+		if (result[0]!.matchup?.matchupId == undefined) {
 			throw createNotFoundError('Matchup');
 		}
 
-		const selectedMatchup = selectedMatchupsRows.reduce<Record<string, MatchupDetails>>((acc, row) => {
+		let selectedMatchup: MatchupDetails | undefined = undefined;
+		for (const row of result) {
 			const currentMatchup = row.matchup;
 			const team1 = row.team1;
 			const team2 = row.team2;
 			const currentGame = row.game;
 
-			if (currentMatchup == null || team1 == null || team2 == null) return acc;
+			if (currentMatchup == null || team1 == null || team2 == null) continue;
 
-			acc[currentMatchup.matchupId] ??= {
+			// because we only fetch 2 images, we don't need to batch them
+			selectedMatchup = {
 				...currentMatchup,
-				team1,
-				team2,
+				team1: {
+					...team1,
+					imageUrl: await getSignedTeamImage(event, tournamentId, team1.teamId),
+				},
+				team2: {
+					...team2,
+					imageUrl: await getSignedTeamImage(event, tournamentId, team2.teamId),
+				},
 				games: [],
 			};
 
 			if (currentGame) {
-				acc[currentMatchup.matchupId]!.games.push(currentGame);
+				selectedMatchup.games.push(currentGame);
 			}
+		}
 
-			return acc;
-		}, {})[0]!;
+		if (!selectedMatchup) {
+			throw new Error('Matchup should have been defined by now');
+		}
 
 		return selectedMatchup;
 	}),
