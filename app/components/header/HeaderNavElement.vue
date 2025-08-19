@@ -15,9 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{
-	to?: string | null;
-}>();
+defineProps<{ to?: string | null }>();
 </script>
 
 <style scoped lang="scss">

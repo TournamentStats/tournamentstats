@@ -41,9 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
-	layout: 'login',
-});
+definePageMeta({ layout: 'login' });
 
 const redirectQuery = useRoute().query.redirectTo;
 const redirect = (Array.isArray(redirectQuery) ? redirectQuery[0] : redirectQuery) ?? '/';
@@ -79,9 +77,7 @@ async function handleRegister() {
 async function handleDiscordLogin() {
 	const { error } = await supabase.auth.signInWithOAuth({
 		provider: 'discord',
-		options: {
-			redirectTo: 'https://localhost:3000/callback', // ?redirectTo=' + encodeURIComponent(redirect),
-		},
+		options: { redirectTo: 'https://localhost:3000/callback' }, // ?redirectTo=' + encodeURIComponent(redirect),
 	});
 	if (error) {
 		console.error(error);

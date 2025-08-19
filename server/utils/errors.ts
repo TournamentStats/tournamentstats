@@ -2,9 +2,13 @@ import { H3Error } from 'h3';
 import type { H3Event } from 'h3';
 import { ZodError, z } from 'zod/v4';
 
-import { consola } from 'consola';
-
-export function createGenericError({ statusCode, statusMessage, message }: { statusCode?: number; statusMessage?: string; message?: string } = {}) {
+export function createGenericError({
+	statusCode, statusMessage, message,
+}: {
+	statusCode?: number;
+	statusMessage?: string;
+	message?: string;
+} = {}) {
 	return createError({
 		statusCode: statusCode ?? 500,
 		statusMessage: statusMessage ?? 'Internal Server error',
@@ -20,7 +24,7 @@ export function createNotFoundError(resource: string, extra?: string) {
 	});
 }
 
-interface ErrorData {
+export interface ErrorData {
 	statusCode: number;
 	statusMessage?: string;
 	error?: {
@@ -65,9 +69,7 @@ export function withErrorHandling<ReturnData>(
 				if (e instanceof H3Error) {
 					errorData.statusCode = e.statusCode;
 					errorData.statusMessage = e.statusMessage;
-					errorData.error = {
-						message: e.message,
-					};
+					errorData.error = { message: e.message };
 				}
 
 				// fill error details manually
@@ -82,7 +84,7 @@ export function withErrorHandling<ReturnData>(
 
 				// log unexpected errors
 				if (errorData.statusCode >= 500 && errorData.statusCode < 600) {
-					event.context.errors.push(e);
+					event.context.errors?.push(e);
 				}
 
 				setResponseHeader(event, 'Content-Type', 'application/json');

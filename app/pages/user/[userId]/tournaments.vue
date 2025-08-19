@@ -6,8 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
-});
+definePageMeta({});
 
 const userId = useRoute().params.userId;
 </script>

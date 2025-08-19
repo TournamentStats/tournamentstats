@@ -17,9 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-const { to } = defineProps<{
-	to?: string;
-}>();
+const { to } = defineProps<{ to?: string }>();
 </script>
 
 <style scoped lang="scss">

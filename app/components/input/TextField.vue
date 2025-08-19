@@ -44,9 +44,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-	inheritAttrs: false,
-});
+defineOptions({ inheritAttrs: false });
 
 const attrs = useAttrs();
 const { 'class': attrsClass, ...attrsWithoutClass } = attrs;
@@ -74,9 +72,7 @@ withDefaults(
 	},
 );
 
-defineEmits<{
-	'update:modelValue': [value: string];
-}>();
+defineEmits<{ 'update:modelValue': [value: string] }>();
 </script>
 
 <style scoped lang="scss">

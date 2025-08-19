@@ -66,5 +66,8 @@ export function UseFile(
 		});
 	});
 
-	return { handleClick, isDragging };
+	return {
+		handleClick,
+		isDragging,
+	};
 }

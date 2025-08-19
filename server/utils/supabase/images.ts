@@ -25,13 +25,11 @@ export async function uploadImage(event: H3Event, imageData: Buffer) {
 	const uploadImageResponse = await client.storage.from('tournament-images')
 		.upload(
 			`uploads/${imageId}.png`, imageData,
-			{
-				contentType: 'image/png',
-			},
+			{ contentType: 'image/png' },
 		);
 
 	if (uploadImageResponse.error) {
-		event.context.errors.push(uploadImageResponse.error);
+		event.context.errors?.push(uploadImageResponse.error);
 		return createError({
 			statusCode: 500,
 			statusMessage: 'Internal Server error',
@@ -57,7 +55,7 @@ export async function moveImage(event: H3Event, from: string, to: string) {
 		.move(from, to);
 
 	if (moveImageResponse.error) {
-		event.context.errors.push(moveImageResponse.error);
+		event.context.errors?.push(moveImageResponse.error);
 
 		if (moveImageResponse.error.name === 'NoSuchKey') {
 			throw createError({
@@ -89,7 +87,7 @@ export async function getSignedURL(event: H3Event, imagePath: string, duration: 
 
 	if (signedUrlResponse.error) {
 		if (signedUrlResponse.error.message !== 'Object not found') {
-			event.context.errors.push(signedUrlResponse.error);
+			event.context.errors?.push(signedUrlResponse.error);
 		}
 		return null;
 	}
@@ -171,7 +169,8 @@ export async function deleteTournamentImages(event: H3Event, tournamentShortId: 
 
 	if (listFilesResponse.error) {
 		logger.error('Error during listing files to delete', {
-			section: 'Storage', error: listFilesResponse.error,
+			section: 'Storage',
+			error: listFilesResponse.error,
 		});
 		return;
 	}
@@ -181,7 +180,8 @@ export async function deleteTournamentImages(event: H3Event, tournamentShortId: 
 
 	if (removeFilesResponse.error) {
 		logger.error('Error during deleting files', {
-			section: 'Storage', error: removeFilesResponse.error,
+			section: 'Storage',
+			error: removeFilesResponse.error,
 		});
 	}
 }
@@ -198,7 +198,8 @@ export async function deleteTeamImage(event: H3Event, tournamentShortId: string,
 	const removeFileResponse = await client.storage.from('tournament-images').remove([`${tournamentShortId}/teams/${teamShortId}.png`]);
 	if (removeFileResponse.error) {
 		logger.error('Error during deleting file', {
-			section: 'Storage', error: removeFileResponse.error,
+			section: 'Storage',
+			error: removeFileResponse.error,
 		});
 	}
 }

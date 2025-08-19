@@ -41,9 +41,7 @@ export const docs: openAPISchema = {
 									type: 'array',
 									minItems: 1,
 									description: 'Players to remove from the team',
-									items: {
-										$ref: '#/components/schemas/PUUID',
-									},
+									items: { $ref: '#/components/schemas/PUUID' },
 								},
 							},
 						},
@@ -90,16 +88,12 @@ export const docs: openAPISchema = {
 							added: {
 								type: 'array',
 								description: 'Players added to the team',
-								items: {
-									$ref: '#/components/schemas/Player',
-								},
+								items: { $ref: '#/components/schemas/Player' },
 							},
 							removed: {
 								type: 'array',
 								description: 'Players removed from the team',
-								items: {
-									$ref: '#/components/schemas/Player',
-								},
+								items: { $ref: '#/components/schemas/Player' },
 							},
 						},
 					},
@@ -130,12 +124,8 @@ export const docs: openAPISchema = {
 				},
 			},
 		},
-		400: {
-			$ref: '#/components/responses/ValidationError',
-		},
-		401: {
-			$ref: '#/components/responses/401',
-		},
+		400: { $ref: '#/components/responses/ValidationError' },
+		401: { $ref: '#/components/responses/401' },
 		404: {
 			description: 'Not Found',
 			content: {
@@ -178,9 +168,7 @@ export const docs: openAPISchema = {
 							value: {
 								statusCode: 404,
 								statusMessage: 'Not Found',
-								error: {
-									message: 'Team not found',
-								},
+								error: { message: 'Team not found' },
 							},
 						},
 						'Player not Found': {

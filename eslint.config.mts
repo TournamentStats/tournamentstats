@@ -11,11 +11,6 @@ const languageOptions: Linter.LanguageOptions = {
 };
 
 export default withNuxt()
-	.prepend({
-		ignores: [
-			'@types/database-generated.types.ts',
-		],
-	})
 	// @ts-expect-error - We are mixing two libraries but this works
 	.append(...tseslint.configs.strictTypeChecked.toSpliced(0, 1), tseslint.configs.stylisticTypeChecked[2])
 	.override('typescript-eslint/eslint-recommended', { languageOptions })
@@ -26,4 +21,11 @@ export default withNuxt()
 		},
 		languageOptions,
 	})
-	.override('typescript-eslint/stylistic-type-checked', { languageOptions });
+	.override('typescript-eslint/stylistic-type-checked', {
+		rules: {
+			'@stylistic/object-curly-newline': ['error', { multiline: true }],
+			'@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
+			'@stylistic/newline-per-chained-call': ['error', { ignoreChainWithDepth: 2 }],
+		},
+		languageOptions,
+	});

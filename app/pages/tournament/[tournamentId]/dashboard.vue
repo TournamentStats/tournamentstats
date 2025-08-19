@@ -3,7 +3,5 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-	middleware: ['authentication'],
-});
+definePageMeta({ middleware: ['authentication'] });
 </script>

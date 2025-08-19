@@ -35,9 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({
-	middleware: 'authentication',
-});
+definePageMeta({ middleware: 'authentication' });
 
 const tournamentName = ref('');
 const tournamentImage = ref <File | null> (null);

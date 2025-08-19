@@ -25,9 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-defineOptions({
-	inheritAttrs: false,
-});
+defineOptions({ inheritAttrs: false });
 </script>
 
 <style scoped lang="scss">

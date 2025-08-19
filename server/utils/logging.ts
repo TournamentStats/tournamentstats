@@ -1,44 +1,60 @@
-import { createLogger, format, transports, type LogEntry } from 'winston';
+import { createLogger, format, transports, config, type LogEntry, type Logger } from 'winston';
 import TransportStream from 'winston-transport';
 import type { H3Event, EventHandlerResponse } from 'h3';
 import type { TransformableInfo } from 'logform';
 import consola from 'consola';
+import { stripAnsi } from 'consola/utils';
 
 declare module 'h3' {
-	interface H3EventContext {
-		errors: Error[];
-	}
+	interface H3EventContext { errors?: Error[] }
 }
 
 interface Meta {
-	payload?: Record<string, unknown> & { user?: string; ipAddress?: string; errors?: Error[] };
+	payload?: Record<string, unknown> & {
+		user?: string;
+		ipAddress?: string;
+		errors?: Error[];
+	};
 	section?: string;
 }
 
 class ConsolaTransport extends TransportStream {
-	override log(info: LogEntry & { payload: { errors: Error[] } }, callback?: () => void) {
+	override log(info: LogEntry & Meta, callback?: () => void) {
 		setImmediate(() => this.emit('logged', info));
 
 		const { level, message, ...meta } = info;
 
+		let c = consola;
+		if (info.section) {
+			c = c.withTag(info.section);
+		}
+
 		switch (level) {
 			case 'error':
-				consola.error({ message, ...meta });
-				for (const error of meta.payload.errors) {
-					consola.error(error);
+				c.error({
+					message,
+					...meta,
+				});
+				if (meta.payload?.errors) {
+					for (const error of meta.payload.errors) {
+						consola.error(error);
+					}
 				}
 				break;
 			case 'warn':
-				consola.warn(message);
+				c.warn(message);
 				break;
 			case 'info':
-				consola.info(message);
+				c.info(message);
 				break;
 			case 'debug':
-				consola.debug(message);
+				c.debug(message);
+				break;
+			case 'success':
+				c.success(message);
 				break;
 			default:
-				consola.log(message);
+				c.log(message);
 		}
 
 		if (callback) callback();
@@ -55,11 +71,22 @@ function indentStack(stack: string | undefined, indent = 4): string {
 		if (i == 0)
 			return line.trim();
 		return pad + line.trim();
-	}).join('\n');
+	})
+		.join('\n');
 }
+
+const customLevels = {
+	levels: {
+		...config.npm.levels,
+		success: 2,
+	},
+};
+
+type CustomLogger = Logger & { success: (message: string, ...meta: unknown[]) => CustomLogger };
 
 const logger = createLogger({
 	level: 'info',
+	levels: customLevels.levels,
 	format: format.combine(
 		format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
 		format.errors({ stack: true }),
@@ -70,7 +97,7 @@ const logger = createLogger({
 			filename: 'logs/latest.log',
 			format: format.combine(
 				format.printf(({ timestamp, level, message, section, payload }: TransformableInfo & Meta) => {
-					let log = `${timestamp as string} [${level.toUpperCase()}] ${section ? `${section} - ` : ''}${message as string}`;
+					let log = `${timestamp as string} [${level.toUpperCase()}] ${section ? `${section} - ` : ''}${stripAnsi(message as string)}`;
 
 					if (payload) {
 						if (payload.errors?.length) {
@@ -92,18 +119,17 @@ const logger = createLogger({
 				}),
 			),
 		}),
-		// JSON log transport
 		new transports.File({
 			filename: 'logs/latest_log.jsonl',
 			format: format.combine(
 				format.json(),
 				format.printf(({ timestamp, level, message, ...meta }) => {
-					const payload = meta.payload && null;
-					const section = meta.section && null;
+					const payload = meta.payload ?? null;
+					const section = meta.section ?? null;
 					return JSON.stringify({
 						timestamp,
 						level,
-						message,
+						message: stripAnsi(message as string),
 						payload,
 						section,
 					});
@@ -111,7 +137,7 @@ const logger = createLogger({
 			),
 		}),
 	],
-});
+}) as CustomLogger;
 
 logger.info('Logging started');
 
@@ -120,10 +146,8 @@ export { logger };
 // utility functions for logging
 
 // Log the result of an API, including route, user/ip and errors, if occured
-export function logAPI(event: H3Event, response?: {
-	body?: Awaited<EventHandlerResponse>;
-}): void {
-	if (event.context.errors.length > 0) {
+export function logAPI(event: H3Event, response?: { body?: Awaited<EventHandlerResponse> }): void {
+	if (event.context.errors && event.context.errors.length > 0) {
 		logger.error(event.toString(), {
 			section: 'Tournament API',
 			payload: {

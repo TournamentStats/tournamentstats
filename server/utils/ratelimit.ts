@@ -9,7 +9,10 @@ interface Limitation {
 	limit: number;
 }
 
-interface LimitExhaust { remaining: number; lastUpdated: Date }
+interface LimitExhaust {
+	remaining: number;
+	lastUpdated: Date;
+}
 
 interface Ratelimit {
 	limits: Limitation[];
@@ -35,6 +38,15 @@ interface RatelimitOptions {
 	ratelimit?: Ratelimit;
 }
 
+/**
+ * Returns an handler that covers business level ratelimiting on api endpoints.
+ * Currently only works with Map Storage.
+ * Should be used after auth middleware.
+ *
+ * @param options.allowIpAddresses Wether an anonymous user should be ratelimited based on his ip address or restricted
+ * @param options.ratelimit Ratelimit object that stores limits and a map for storing identifiers.
+ * @returns
+ */
 export function ratelimit(options: RatelimitOptions = {}) {
 	const allowIpAddresses = options.allowIpAddresses ?? true;
 	const ratelimit = options.ratelimit ?? globalRatelimit;
@@ -67,7 +79,7 @@ export function ratelimit(options: RatelimitOptions = {}) {
 			throw createError({
 				status: 401,
 				message: 'Unauthorized',
-				statusMessage: 'This endpoint needs authorization, either through logging in or logging ip address',
+				statusMessage: 'This endpoint needs authorization, either through logging in or ip addresses',
 			});
 		}
 
@@ -94,7 +106,10 @@ export function ratelimit(options: RatelimitOptions = {}) {
 			}
 
 			if (rem.remaining <= 0) {
-				exhausted.push({ limit, rem });
+				exhausted.push({
+					limit,
+					rem,
+				});
 			}
 			else {
 				rem.remaining -= 1;

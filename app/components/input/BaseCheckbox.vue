@@ -13,12 +13,8 @@
 </template>
 
 <script lang="ts" setup>
-defineOptions({
-	inheritAttrs: false,
-});
-const props = defineProps<{
-	id: string;
-}>();
+defineOptions({ inheritAttrs: false });
+const props = defineProps<{ id: string }>();
 </script>
 
 <style scoped lang="scss">

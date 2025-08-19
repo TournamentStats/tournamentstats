@@ -42,9 +42,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({
-	inheritAttrs: false,
-});
+defineOptions({ inheritAttrs: false });
 
 const showPassword = ref(false);
 
@@ -69,9 +67,7 @@ withDefaults(
 	},
 );
 
-defineEmits<{
-	'update:modelValue': [value: string];
-}>();
+defineEmits<{ 'update:modelValue': [value: string] }>();
 </script>
 
 <style scoped lang="scss">

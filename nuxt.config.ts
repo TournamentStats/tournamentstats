@@ -16,8 +16,14 @@ export default defineNuxtConfig({
 	app: {
 		head: {
 			link: [
-				{ rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-				{ rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+				{
+					rel: 'preconnect',
+					href: 'https://fonts.googleapis.com',
+				},
+				{
+					rel: 'preconnect',
+					href: 'https://fonts.gstatic.com',
+				},
 				{
 					rel: 'stylesheet',
 					href: 'https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght,GRAD,XOPQ,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC@8..144,25..151,100..1000,-200..150,27..175,25..135,649..854,-305..-98,560..788,416..570,528..760&display=swap',
@@ -26,17 +32,26 @@ export default defineNuxtConfig({
 					rel: 'stylesheet',
 					href: 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
 				},
-				{ rel: 'icon', type: 'image/png', href: '/favicon32x32.png' },
+				{
+					rel: 'icon',
+					type: 'image/png',
+					href: '/favicon32x32.png',
+				},
 			],
 		},
 	},
 	css: ['normalize.css', '~/assets/main.scss', '~/assets/fonts.scss'],
 
 	runtimeConfig: {
-		alphabets: {
-			imageIds: '',
+		alphabets: { imageIds: '' },
+		db: {
+			url: '',
+			host: '',
+			port: '',
+			username: '',
+			name: '',
+			password: '',
 		},
-		databaseURL: '',
 		siteURL: '',
 		backendBaseURL: '',
 		riotGamesApiKey: '',
@@ -53,10 +68,7 @@ export default defineNuxtConfig({
 		'#build': resolve(__dirname, '.nuxt'),
 		'#internal/nuxt/paths': resolve(__dirname, '.nuxt/paths.mjs'),
 		'@server': resolve(__dirname, 'server'),
-		'@types': resolve(__dirname, '@types'),
-	},
-	build: {
-		transpile: ['riot-games-fetch-typed'],
+		'@types': resolve(__dirname, 'server/@types'),
 	},
 
 	devServer: {
@@ -65,32 +77,47 @@ export default defineNuxtConfig({
 			cert: './localhost.crt',
 		},
 	},
-	future: {
-		compatibilityVersion: 4,
+	future: { compatibilityVersion: 4 },
+
+	experimental: {
+		decorators: true,
 	},
 
 	compatibilityDate: '2025-06-09',
 
 	nitro: {
+		esbuild: {
+			options: {
+				tsconfigRaw: {
+					compilerOptions: {
+						experimentalDecorators: true,
+						// @ts-expect-error I am testing if this makes any difference.
+						emitDecoratorMetadata: true,
+						esModuleInterop: true,
+					},
+				},
+			},
+		},
 		typescript: {
 			tsConfig: {
 				compilerOptions: {
+					target: 'ES2022',
+					declaration: true,
 					strict: true,
 					strictNullChecks: true,
 					noImplicitAny: true,
 					noImplicitThis: true,
 					alwaysStrict: true,
 					noUncheckedIndexedAccess: true,
+					experimentalDecorators: true,
+					emitDecoratorMetadata: true,
+					esModuleInterop: true,
 				},
 			},
 		},
-		imports: {
-			dirs: [
-				'server/utils',
-			],
-		},
 		experimental: {
 			openAPI: true,
+			asyncContext: true,
 		},
 		openAPI: {
 			meta: {
@@ -115,17 +142,14 @@ export default defineNuxtConfig({
 		plugins: [
 			devtoolslsJson(),
 		],
-		build: {
-			sourcemap: true,
-		},
+		build: { sourcemap: true },
 	},
 
 	typescript: {
-		typeCheck: true,
+		typeCheck: 'build',
 		strict: true,
 		tsConfig: {
-			include: ['../drizzle.config.ts', '../eslint.config.mts'],
-			exclude: ['../drizzle'],
+			include: ['../eslint.config.mts'],
 			compilerOptions: {
 				strict: true,
 				strictNullChecks: true,
@@ -138,15 +162,14 @@ export default defineNuxtConfig({
 		},
 	},
 
-	telemetry: {
-		enabled: false,
-	},
+	telemetry: { enabled: false },
 
 	eslint: {
 		config: {
 			stylistic: {
 				indent: 'tab',
 				semi: true,
+				quotes: 'single',
 			},
 		},
 	},
