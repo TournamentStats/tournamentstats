@@ -17,6 +17,7 @@ export class GameTeamDetails extends BaseEntity {
 	@ManyToOne({
 		entity: () => Game,
 		primary: true,
+		inversedBy: 'teamDetails',
 	})
 	game!: Game;
 

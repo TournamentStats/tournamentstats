@@ -4,6 +4,37 @@ import { Player } from './Player.entity';
 import { Side } from './common';
 import { BaseEntity } from './base.entity';
 
+export interface Build {
+	items: {
+		item0_id: number;
+		item1_id: number;
+		item2_id: number;
+		item3_id: number;
+		item4_id: number;
+		item5_id: number;
+		item6_id: number;
+	};
+	runes: {
+		primary: {
+			rune1_id: number;
+			rune2_id: number;
+			rune3_id: number;
+			rune4_id: number;
+		};
+		sub: {
+			rune1_id: number;
+			rune2_id: number;
+		};
+		stat_perks: {
+			defense: number;
+			flex: number;
+			offense: number;
+		};
+	};
+	summoner_spell1_id: number;
+	summoner_spell2_id: number;
+}
+
 @Entity()
 export class GamePlayerDetails extends BaseEntity {
 	[PrimaryKeyProp]?: ['puuid', 'game'];
@@ -11,12 +42,14 @@ export class GamePlayerDetails extends BaseEntity {
 	@ManyToOne({
 		entity: () => Player,
 		primary: true,
+		inversedBy: 'gameDetails',
 	})
 	puuid!: Player;
 
 	@ManyToOne({
 		entity: () => Game,
 		primary: true,
+		inversedBy: 'playerDetails',
 	})
 	game!: Game;
 
@@ -39,119 +72,10 @@ export class GamePlayerDetails extends BaseEntity {
 	side!: Side;
 
 	@Property({
-		type: 'number',
+		type: 'json',
 		nullable: true,
 	})
-	item0?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item1?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item2?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item3?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item4?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item5?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	item6?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	capstoneRuneId?: number;
-
-	@Property({
-		fieldName: 'primary_rune1_id',
-		type: 'number',
-		nullable: true,
-	})
-	primaryRune1Id?: number;
-
-	@Property({
-		fieldName: 'primary_rune2_id',
-		type: 'number',
-		nullable: true,
-	})
-	primaryRune2Id?: number;
-
-	@Property({
-		fieldName: 'primary_rune3_id',
-		type: 'number',
-		nullable: true,
-	})
-	primaryRune3Id?: number;
-
-	@Property({
-		fieldName: 'sub_rune1_id',
-		type: 'number',
-		nullable: true,
-	})
-	subRune1Id?: number;
-
-	@Property({
-		fieldName: 'sub_rune2_id',
-		type: 'number',
-		nullable: true,
-	})
-	subRune2Id?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	statDefense?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	statFlex?: number;
-
-	@Property({
-		type: 'number',
-		nullable: true,
-	})
-	statOffense?: number;
-
-	@Property({
-		fieldName: 'summoner1_id',
-		type: 'number',
-		nullable: true,
-	})
-	summoner1Id?: number;
-
-	@Property({
-		fieldName: 'summoner2_id',
-		type: 'number',
-		nullable: true,
-	})
-	summoner2Id?: number;
+	build?: Build;
 
 	@Property({
 		type: 'boolean',

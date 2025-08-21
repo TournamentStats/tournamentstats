@@ -7,15 +7,17 @@ import { BaseEntity } from './base.entity';
 export class MatchupGame extends BaseEntity {
 	[PrimaryKeyProp]?: ['matchup', 'ordering'];
 
-	@ManyToOne(() => Game)
-	game!: Game;
-
 	@ManyToOne({
 		entity: () => Matchup,
 		primary: true,
+		inversedBy: 'games',
 	})
 	matchup!: Matchup;
 
 	@PrimaryKey({ type: 'number' })
 	ordering!: number;
+
+	// don't need inverse mapping here
+	@ManyToOne(() => Game)
+	game!: Game;
 }

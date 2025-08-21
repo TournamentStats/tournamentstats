@@ -1,6 +1,8 @@
-import { Entity, Enum, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
+import { type Collection, Entity, Enum, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
 import { Region } from './common';
 import { BaseEntity } from './base.entity';
+import { TournamentPlayerParticipation } from './TournamentPlayerParticipation.entity';
+import { GamePlayerDetails } from './GamePlayerDetails.entity';
 
 @Entity()
 export class Player extends BaseEntity {
@@ -24,6 +26,18 @@ export class Player extends BaseEntity {
 		nativeEnumName: 'region',
 	})
 	region!: Region;
+
+	@OneToMany({
+		entity: () => TournamentPlayerParticipation,
+		mappedBy: 'puuid',
+	})
+	tournamentParticipations!: Collection<TournamentPlayerParticipation>;
+
+	@OneToMany({
+		entity: () => GamePlayerDetails,
+		mappedBy: 'puuid',
+	})
+	gameDetails!: Collection<GamePlayerDetails>;
 }
 
 export { Region } from './common';

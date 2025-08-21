@@ -1,5 +1,7 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, OneToMany, PrimaryKey, Property, type Collection } from '@mikro-orm/core';
 import { BaseEntity } from './base.entity';
+import { GamePlayerDetails } from './GamePlayerDetails.entity';
+import { GameTeamDetails } from './GameTeamDetails.entity';
 
 @Entity()
 export class Game extends BaseEntity {
@@ -14,4 +16,16 @@ export class Game extends BaseEntity {
 
 	@Property({ type: 'Date' })
 	gameStart!: Date;
+
+	@OneToMany({
+		entity: () => GamePlayerDetails,
+		mappedBy: 'game',
+	})
+	playerDetails!: Collection<GamePlayerDetails>;
+
+	@OneToMany({
+		entity: () => GameTeamDetails,
+		mappedBy: 'game',
+	})
+	teamDetails!: Collection<GameTeamDetails>;
 }
