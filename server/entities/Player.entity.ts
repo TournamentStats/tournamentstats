@@ -1,4 +1,4 @@
-import { type Collection, Entity, Enum, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Entity, Enum, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
 import { Region } from './common';
 import { BaseEntity } from './base.entity';
 import { TournamentPlayerParticipation } from './TournamentPlayerParticipation.entity';
@@ -29,15 +29,15 @@ export class Player extends BaseEntity {
 
 	@OneToMany({
 		entity: () => TournamentPlayerParticipation,
-		mappedBy: 'puuid',
+		mappedBy: 'player',
 	})
-	tournamentParticipations!: Collection<TournamentPlayerParticipation>;
+	tournamentParticipations = new Collection<TournamentPlayerParticipation>(this);
 
 	@OneToMany({
 		entity: () => GamePlayerDetails,
 		mappedBy: 'puuid',
 	})
-	gameDetails!: Collection<GamePlayerDetails>;
+	gameDetails = new Collection<GamePlayerDetails>(this);
 }
 
 export { Region } from './common';

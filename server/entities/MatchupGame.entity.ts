@@ -1,23 +1,28 @@
-import { Entity, ManyToOne, PrimaryKey, PrimaryKeyProp } from '@mikro-orm/core';
-import { Game } from './Game.entity';
-import { Matchup } from './Matchup.entity';
+import { Entity, ManyToOne, PrimaryKey, PrimaryKeyProp, Unique } from '@mikro-orm/core';
+import type { Game } from './Game.entity';
+import type { Matchup } from './Matchup.entity';
 import { BaseEntity } from './base.entity';
 
 @Entity()
+@Unique({ properties: ['matchup', 'game'] })
 export class MatchupGame extends BaseEntity {
 	[PrimaryKeyProp]?: ['matchup', 'ordering'];
 
 	@ManyToOne({
-		entity: () => Matchup,
+		entity: 'Matchup',
 		primary: true,
-		inversedBy: 'games',
+		joinColumn: 'matchup_id',
+		referenceColumnName: 'matchup_id',
 	})
 	matchup!: Matchup;
 
 	@PrimaryKey({ type: 'number' })
 	ordering!: number;
 
-	// don't need inverse mapping here
-	@ManyToOne(() => Game)
+	@ManyToOne({
+		entity: 'Game',
+		joinColumn: 'game_id',
+		referenceColumnName: 'game_id',
+	})
 	game!: Game;
 }

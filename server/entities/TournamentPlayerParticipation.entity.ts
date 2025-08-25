@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, Enum, Property, PrimaryKey } from '@mikro-orm/core';
-import { Player } from './Player.entity';
+import type { Player } from './Player.entity';
 import { Tournament } from './Tournament.entity';
 import { TeamPosition } from './common';
 import { BaseEntity } from './base.entity';
@@ -13,15 +13,26 @@ export class TournamentPlayerParticipation extends BaseEntity {
 	})
 	id!: number;
 
-	@ManyToOne({ entity: () => Player })
-	puuid!: Player;
+	@ManyToOne({
+		entity: 'Player',
+		joinColumn: 'puuid',
+		referenceColumnName: 'puuid',
+	})
+	player!: Player;
 
-	@ManyToOne({ entity: () => Tournament })
+	@ManyToOne({
+		entity: () => Tournament,
+		joinColumn: 'tournament_id',
+		referenceColumnName: 'tournament_id',
+	})
 	tournament!: Tournament;
 
+	// maybe allowed?
 	@ManyToOne({
 		entity: () => TournamentTeamParticipation,
 		nullable: true,
+		joinColumns: ['tournament_id', 'team_id'],
+		referencedColumnNames: ['tournament_id', 'team_id'],
 	})
 	teamParticipation?: TournamentTeamParticipation;
 

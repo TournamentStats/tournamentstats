@@ -1,11 +1,12 @@
-import { type Collection, Entity, Enum, ManyToOne, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
-import { Tournament } from './Tournament.entity';
+import { Collection, Entity, Enum, ManyToMany, ManyToOne, type Opt, PrimaryKey, Property, Unique } from '@mikro-orm/core';
+import type { Tournament } from './Tournament.entity';
 import { Format } from './common';
 import { BaseEntity } from './base.entity';
-import { MatchupTeamParticipation } from './MatchupTeamParticipation.entity';
 import { MatchupGame } from './MatchupGame.entity';
+import { Game } from './Game.entity';
 
 @Entity()
+@Unique({ properties: ['tournament', 'matchupId'] })
 export class Matchup extends BaseEntity {
 	@PrimaryKey({ type: 'number' })
 	matchupId!: number & Opt;
@@ -14,8 +15,10 @@ export class Matchup extends BaseEntity {
 	shortId!: string & Opt;
 
 	@ManyToOne({
-		entity: () => Tournament,
+		entity: 'Tournament',
 		inversedBy: 'matchups',
+		joinColumn: 'tournament_id',
+		referenceColumnName: 'tournament_id',
 	})
 	tournament!: Tournament;
 
@@ -26,17 +29,11 @@ export class Matchup extends BaseEntity {
 	})
 	format?: Format;
 
-	@OneToMany({
-		entity: () => MatchupTeamParticipation,
-		mappedBy: 'matchup',
+	@ManyToMany({
+		entity: () => Game,
+		pivotEntity: () => MatchupGame,
 	})
-	teams!: MatchupTeamParticipation;
-
-	@OneToMany({
-		entity: () => MatchupGame,
-		mappedBy: 'matchup',
-	})
-	games!: Collection<MatchupGame>;
+	games = new Collection<Game>(this);
 }
 
 export { Format } from './common';

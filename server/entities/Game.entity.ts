@@ -21,11 +21,11 @@ export class Game extends BaseEntity {
 		entity: () => GamePlayerDetails,
 		mappedBy: 'game',
 	})
-	playerDetails!: Collection<GamePlayerDetails>;
+	playerDetails = new Collection<GamePlayerDetails>(this);
 
 	@OneToMany({
 		entity: () => GameTeamDetails,
 		mappedBy: 'game',
 	})
-	teamDetails!: Collection<GameTeamDetails>;
+	teamDetails = new Collection<GameTeamDetails>(this);
 }

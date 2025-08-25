@@ -10,9 +10,6 @@ export class TournamentShareToken extends BaseEntity {
 	@Property({ type: 'string' })
 	shareToken!: string;
 
-	@ManyToOne({
-		entity: () => Tournament,
-		inversedBy: 'shareTokens',
-	})
+	@ManyToOne({ entity: () => Tournament })
 	tournament!: Tournament;
 }

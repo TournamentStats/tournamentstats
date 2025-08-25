@@ -1,10 +1,11 @@
-import { type Collection, Entity, Enum, ManyToOne, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Entity, Enum, ManyToMany, ManyToOne, OneToMany, type Opt, PrimaryKey, Property } from '@mikro-orm/core';
 import { Region } from './common';
 import { SupabaseUser } from './SupabaseUser.entity';
 import { BaseEntity } from './base.entity';
 import { TournamentTeamParticipation } from './TournamentTeamParticipation.entity';
-import { TournamentShareToken } from './TournamentShareToken.entity';
 import { TournamentPlayerParticipation } from './TournamentPlayerParticipation.entity';
+import { Team } from './Team.entity';
+import { Player } from './Player.entity';
 import { Matchup } from './Matchup.entity';
 
 @Entity()
@@ -21,6 +22,8 @@ export class Tournament extends BaseEntity {
 	@ManyToOne({
 		entity: () => SupabaseUser,
 		inversedBy: 'tournaments',
+		joinColumn: 'owner_id',
+		referenceColumnName: 'id',
 	})
 	owner!: SupabaseUser;
 
@@ -45,29 +48,23 @@ export class Tournament extends BaseEntity {
 	})
 	region!: Region;
 
-	@OneToMany({
-		entity: () => TournamentTeamParticipation,
-		mappedBy: 'tournament',
+	@ManyToMany({
+		entity: () => Team,
+		pivotEntity: () => TournamentTeamParticipation,
 	})
-	participatingTeams!: Collection<TournamentTeamParticipation>;
+	teams = new Collection<Team>(this);
 
-	@OneToMany({
-		entity: () => TournamentPlayerParticipation,
-		mappedBy: 'tournament',
+	@ManyToMany({
+		entity: () => Player,
+		pivotEntity: () => TournamentPlayerParticipation,
 	})
-	participatingPlayers!: Collection<TournamentPlayerParticipation>;
+	players = new Collection<Player>(this);
 
 	@OneToMany({
 		entity: () => Matchup,
 		mappedBy: 'tournament',
 	})
-	matchups!: Collection<Matchup>;
-
-	@OneToMany({
-		entity: () => TournamentShareToken,
-		mappedBy: 'tournament',
-	})
-	shareTokens!: Collection<TournamentShareToken>;
+	matchups = new Collection<Matchup>(this);
 }
 
 export { Region } from './common';

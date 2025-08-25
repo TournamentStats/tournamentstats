@@ -1,6 +1,9 @@
-import { Entity, ManyToOne, type Opt,	PrimaryKey,	Property } from '@mikro-orm/core';
+import { Collection, Entity, ManyToMany, ManyToOne, type Opt,	PrimaryKey,	Property } from '@mikro-orm/core';
 import { BaseEntity } from './base.entity';
-import { SupabaseUser } from './SupabaseUser.entity';
+import type { SupabaseUser } from './SupabaseUser.entity';
+import { Matchup } from './Matchup.entity';
+import { MatchupTeamParticipation } from './MatchupTeamParticipation.entity';
+import { Tournament } from './Tournament.entity';
 
 @Entity()
 export class Team extends BaseEntity {
@@ -11,8 +14,10 @@ export class Team extends BaseEntity {
 	shortId!: string & Opt;
 
 	@ManyToOne({
-		entity: () => SupabaseUser,
+		entity: 'SupabaseUser',
 		inversedBy: 'teams',
+		joinColumn: 'owner_id',
+		referenceColumnName: 'id',
 	})
 	owner!: SupabaseUser;
 
@@ -27,4 +32,16 @@ export class Team extends BaseEntity {
 
 	@Property({ type: 'boolean' })
 	isPrivate!: boolean;
+
+	@ManyToMany({
+		entity: () => Matchup,
+		pivotEntity: () => MatchupTeamParticipation,
+	})
+	matchups = new Collection<Matchup>(this);
+
+	@ManyToMany({
+		entity: () => Tournament,
+		mappedBy: 'teams',
+	})
+	tournaments = new Collection<Tournament>(this);
 }

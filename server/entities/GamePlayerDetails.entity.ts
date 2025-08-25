@@ -1,5 +1,5 @@
 import { Entity, Enum, ManyToOne, PrimaryKeyProp, Property } from '@mikro-orm/core';
-import { Game } from './Game.entity';
+import type { Game } from './Game.entity';
 import { Player } from './Player.entity';
 import { Side } from './common';
 import { BaseEntity } from './base.entity';
@@ -43,13 +43,17 @@ export class GamePlayerDetails extends BaseEntity {
 		entity: () => Player,
 		primary: true,
 		inversedBy: 'gameDetails',
+		joinColumn: 'puuid',
+		referenceColumnName: 'puuid',
 	})
 	puuid!: Player;
 
 	@ManyToOne({
-		entity: () => Game,
+		entity: 'Game',
 		primary: true,
 		inversedBy: 'playerDetails',
+		joinColumn: 'game_id',
+		referenceColumnName: 'game_id',
 	})
 	game!: Game;
 

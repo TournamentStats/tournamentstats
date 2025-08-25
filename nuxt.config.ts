@@ -79,9 +79,7 @@ export default defineNuxtConfig({
 	},
 	future: { compatibilityVersion: 4 },
 
-	experimental: {
-		decorators: true,
-	},
+	experimental: { decorators: true },
 
 	compatibilityDate: '2025-06-09',
 
@@ -100,6 +98,9 @@ export default defineNuxtConfig({
 		},
 		typescript: {
 			tsConfig: {
+				include: [
+					resolve(__dirname, 'server/mikro-orm.config.ts'),
+				],
 				compilerOptions: {
 					target: 'ES2022',
 					declaration: true,
@@ -115,10 +116,7 @@ export default defineNuxtConfig({
 				},
 			},
 		},
-		experimental: {
-			openAPI: true,
-			asyncContext: true,
-		},
+		experimental: { openAPI: true },
 		openAPI: {
 			meta: {
 				title: 'TournamentStats',
@@ -149,7 +147,9 @@ export default defineNuxtConfig({
 		typeCheck: 'build',
 		strict: true,
 		tsConfig: {
-			include: ['../eslint.config.mts'],
+			include: [
+				resolve(__dirname, 'eslint.config.mts'),
+			],
 			compilerOptions: {
 				strict: true,
 				strictNullChecks: true,
@@ -158,6 +158,11 @@ export default defineNuxtConfig({
 				alwaysStrict: true,
 				noUncheckedIndexedAccess: true,
 				noErrorTruncation: true,
+				target: 'ES2022',
+				declaration: true,
+				experimentalDecorators: true,
+				emitDecoratorMetadata: true,
+				esModuleInterop: true,
 			},
 		},
 	},

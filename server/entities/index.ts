@@ -1,6 +1,5 @@
 export * from './common';
 export * from './base.entity';
-export * from './FormatAbbrevation.entity';
 export * from './Game.entity';
 export * from './GamePlayerDetails.entity';
 export * from './GameTeamDetails.entity';

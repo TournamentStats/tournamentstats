@@ -13,9 +13,8 @@
 		"gen-db-types": "supabase --workdir ../backend gen types --local --schema public,storage > ./types/database-generated.types.ts"
 	},
 	"dependencies": {
-		"@mikro-orm/core": "^6.4.16",
-		"@mikro-orm/postgresql": "^6.4.16",
-		"@mikro-orm/reflection": "^6.4.16",
+		"@mikro-orm/core": "7.0.0-dev.22",
+		"@mikro-orm/postgresql": "7.0.0-dev.22",
 		"@mikro-orm/sql-highlighter": "^1.0.1",
 		"@supabase/supabase-js": "^2.55.0",
 		"consola": "^3.4.2",
@@ -34,10 +33,11 @@
 	},
 	"devDependencies": {
 		"@eslint/config-inspector": "^1.2.0",
-		"@mikro-orm/cli": "^6.4.16",
-		"@mikro-orm/entity-generator": "^6.4.16",
+		"@mikro-orm/cli": "7.0.0-dev.22",
 		"@nuxt/eslint": "1.5.2",
 		"@nuxtjs/supabase": "^1.6.0",
+		"@swc-node/register": "^1.11.1",
+		"@swc/core": "^1.13.4",
 		"@types/node": "^24.3.0",
 		"@types/source-map-support": "^0.5.10",
 		"@typescript-eslint/eslint-plugin": "^8.39.1",
@@ -55,6 +55,7 @@
 		"typescript": "5.9.2",
 		"typescript-eslint": "^8.39.1",
 		"vite-plugin-devtools-json": "^1.0.0",
+		"vitest": "^3.2.4",
 		"vue-tsc": "^3.0.5"
 	},
 	"pnpm": {
@@ -69,10 +70,11 @@
 	},
 	"mikro-orm": {
 		"alwaysAllowTs": true,
-		"useTsNode": false,
+		"useTsNode": true,
 		"configPaths": [
 			"./server/mikro-orm.config.ts"
-		]
+		],
+		"tsConfigPath": "./server/tsconfig.json"
 	},
-	"packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
+	"packageManager": "pnpm@10.15.0"
 }

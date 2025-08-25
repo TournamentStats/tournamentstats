@@ -1,47 +1,48 @@
 import 'dotenv/config';
 
 import { PostgreSqlDriver, type Options } from '@mikro-orm/postgresql';
-// import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
-// import {
-// 	FormatAbbrevation,
-// 	Game,
-// 	GamePlayerDetails,
-// 	GameTeamDetails,
-// 	Matchup,
-// 	MatchupGame,
-// 	MatchupGameTeam,
-// 	MatchupTeam,
-// 	Player,
-// 	Tournament,
-// 	TournamentParticipant,
-// 	TournamentShareToken,
-// 	SupabaseUser,
-// } from './entities';
+import {
+	BaseEntity,
+	SupabaseUser,
+	Tournament,
+	TournamentShareToken,
+	Team,
+	TournamentTeamParticipation,
+	Player,
+	TournamentPlayerParticipation,
+	Matchup,
+	Game,
+	GamePlayerDetails,
+	GameTeamDetails,
+	MatchupGame,
+	MatchupGameTeamParticipation,
+	MatchupTeamParticipation,
+} from './entities';
+
+// import { BaseEntity } from './entities/base.entity';
 
 const config: Options = {
-	// for simplicity, we use the SQLite database, as it's available pretty much everywhere
 	driver: PostgreSqlDriver,
 	clientUrl: process.env.NUXT_DB_URL,
-	// entities: [
-	// 	FormatAbbrevation,
-	// 	Game,
-	// 	GamePlayerDetails,
-	// 	GameTeamDetails,
-	// 	Matchup,
-	// 	MatchupGame,
-	// 	MatchupGameTeam,
-	// 	MatchupTeam,
-	// 	Player,
-	// 	Tournament,
-	// 	TournamentParticipant,
-	// 	TournamentShareToken,
-	// 	SupabaseUser,
-	// ],
 	entities: [
-		'server/entities/**/*.ts',
+		BaseEntity,
+		SupabaseUser,
+		Tournament,
+		TournamentShareToken,
+		Team,
+		TournamentTeamParticipation,
+		Player,
+		TournamentPlayerParticipation,
+		Matchup,
+		Game,
+		GamePlayerDetails,
+		GameTeamDetails,
+		MatchupGame,
+		MatchupGameTeamParticipation,
+		MatchupTeamParticipation,
 	],
-	// metadataProvider: TsMorphMetadataProvider,
+	metadataProvider: undefined,
 	debug: true,
 };
 

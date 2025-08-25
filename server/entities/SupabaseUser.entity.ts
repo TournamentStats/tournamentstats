@@ -1,4 +1,4 @@
-import { Entity, OneToMany, PrimaryKey, type Collection } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, PrimaryKey } from '@mikro-orm/core';
 import { BaseEntity } from './base.entity';
 import type { UUID } from 'crypto';
 import { Tournament } from './Tournament.entity';
@@ -14,13 +14,13 @@ export class SupabaseUser extends BaseEntity {
 
 	@OneToMany({
 		entity: () => Tournament,
-		mappedBy: 'tournamentId',
+		mappedBy: 'owner',
 	})
-	tournaments!: Collection<Tournament>;
+	tournaments = new Collection<Tournament>(this);
 
 	@OneToMany({
 		entity: () => Team,
-		mappedBy: 'teamId',
+		mappedBy: 'owner',
 	})
-	teams!: Collection<Team>;
+	teams = new Collection<Team>(this);
 }

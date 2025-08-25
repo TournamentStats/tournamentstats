@@ -1,22 +1,22 @@
-import { Entity, Enum, ManyToOne, PrimaryKey, PrimaryKeyProp } from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, PrimaryKeyProp } from '@mikro-orm/core';
 import { MatchupGame } from './MatchupGame.entity';
 import { MatchupTeamParticipation } from './MatchupTeamParticipation.entity';
 import { Side } from './common';
 import { BaseEntity } from './base.entity';
-import type { Matchup } from './Matchup.entity';
 
 @Entity()
 export class MatchupGameTeamParticipation extends BaseEntity {
-	[PrimaryKeyProp]?: ['matchup', 'game', 'side'];
-
-	@PrimaryKey({ type: 'matchup' })
-	matchup!: Matchup;
+	[PrimaryKeyProp]?: ['matchupGame', 'side'];
 
 	@ManyToOne({
 		primary: true,
 		entity: () => MatchupGame,
+		// manually overwrite because 2 keys exists, inconsistent else
+		columnTypes: ['integer', 'text'],
+		joinColumns: ['matchup_id', 'game_id'],
+		referencedColumnNames: ['matchup_id', 'game_id'],
 	})
-	game!: MatchupGame;
+	matchupGame!: MatchupGame;
 
 	@Enum({
 		items: () => Side,
@@ -27,7 +27,10 @@ export class MatchupGameTeamParticipation extends BaseEntity {
 
 	@ManyToOne({
 		entity: () => MatchupTeamParticipation,
-		inversedBy: 'games',
+		// manually overwrite because 2 keys exists, inconsistent else
+		columnTypes: ['integer', 'integer'],
+		joinColumns: ['matchup_id', 'team_id'],
+		referencedColumnNames: ['matchup_id', 'team_id'],
 	})
 	team!: MatchupTeamParticipation;
 }
